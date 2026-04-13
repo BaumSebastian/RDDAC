@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/BaumSebastian/RDDAC/main/docs/images/icon/RDDAC_RAW.png" width="150"/>
+  <img src="https://raw.githubusercontent.com/BaumSebastian/RDDAC/main/docs/images/icon/icon.png" width="150"/>
   <h1>Real Deep Drawing and Cutting (RDDAC) Dataset</h1>
 
   <h3>Coming Soon</h3>
