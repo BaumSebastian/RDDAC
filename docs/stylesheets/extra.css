@@ -1,0 +1,7 @@
+/* RDDAC brand color: dark purple #470047 (used with palette `primary: custom`). */
+:root {
+  --md-primary-fg-color:        #470047;
+  --md-primary-fg-color--light: #7a2e7a;
+  --md-primary-fg-color--dark:  #2e002e;
+  --md-accent-fg-color:         #8a3d8a;
+}

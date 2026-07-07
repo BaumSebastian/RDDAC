@@ -1,0 +1,616 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "containedIn": "cr:containedIn",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "equivalentProperty": "cr:equivalentProperty",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "samplingRate": "cr:samplingRate",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform",
+    "wd": "https://www.wikidata.org/wiki/"
+  },
+  "@type": "sc:Dataset",
+  "name": "Real Deep Drawing and Cutting (RDDAC) Dataset",
+  "description": "The Real Deep Drawing and Cutting (RDDAC) Dataset is the experimental counterpart to the DDACS simulation dataset. It contains physical measurements from a deep drawing and cutting process for DP600 sheet metal, captured on modified quadratic cups, and is intended for studying the deviation between finite element simulation and physical reality.\n\nThe dataset comprises approximately 9000 experiments spanning two base geometries (concave, convex) crossed with three blankholder forces (100, 300, 500 kN) and three lubrication patterns (coarse, medium, fine), giving 18 categories with up to 500 repetitions each. Each experiment is stored as a HDF5 file and captures, where available: press force and process signals (load cells and temperature); a sheet thickness traverse; an oil film traverse; and 3D laser scans (height and luminescence) of the part after deep drawing (OP10) and after cutting (OP20).\n\nEach HDF5 file carries named scalar root attributes matching the columns of process_parameters.csv (process_parameters.tab on the DaRUS UI), the central index that maps every experiment to its parameters, data availability flags, and a recommended ML train, validation, and test split. A sample.zip (one experiment per category, 18 files in total) is provided for fast preview without downloading the full dataset. A Croissant 1.1 manifest (metadata.json) describes every field for direct use with mlcroissant. The accompanying Python package includes an optional preprocessing step that reconstructs cleaned 3D point clouds and aligns them to the matching DDACS simulations.",
+  "url": "https://doi.org/10.18419/DARUS-5589",
+  "version": "1.0",
+  "license": "http://creativecommons.org/licenses/by/4.0",
+  "citeAs": "Baum, S., Heinzelmann, P., Clauß, P. et al. Statistical Analysis of Simulation-to-Reality Deviation in Deep Drawing with a Benchmark Dataset. Trans Indian Inst Met 79, 176 (2026).",
+  "datePublished": "2026-06-01",
+  "creator": [
+    {
+      "@type": "Person",
+      "name": "Baum, Sebastian",
+      "affiliation": "University of Stuttgart",
+      "identifier": ""
+    },
+    {
+      "@type": "Person",
+      "name": "Heinzelmann, Pascal",
+      "affiliation": "University of Stuttgart",
+      "identifier": ""
+    }
+  ],
+  "keywords": [
+    "Deep Drawing",
+    "Sheet Metal Forming",
+    "Machine Learning",
+    "Point Cloud",
+    "Experimental Measurement",
+    "DP600",
+    "Springback",
+    "Sim-to-Real"
+  ],
+  "measurementTechnique": "Physical deep drawing and cutting experiments with force, lubricant, sheet-thickness, and 3D laser-scan measurements.",
+  "conformsTo": "http://mlcommons.org/croissant/1.1",
+  "isLiveDataset": false,
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "process_parameters_csv",
+      "name": "process_parameters.csv",
+      "description": "Per-experiment parameter table; join to HDF5 files via `index`.",
+      "encodingFormat": "text/csv",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/598301?format=original",
+      "md5": "b78905067334bcd6860360b5869a85ac",
+      "contentSize": "446989 B"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "concave_zip",
+      "name": "concave.zip",
+      "encodingFormat": "application/zip",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/594673",
+      "md5": "853540085b144d6e7ece154a9e204a19",
+      "contentSize": "45164424057 B",
+      "description": "Raw experimental measurements for the concave geometry (4491 experiments). One HDF5 file per experiment. The 9 concave experiments shown in sample.zip are not repeated here."
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "convex_zip",
+      "name": "convex.zip",
+      "encodingFormat": "application/zip",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/594674",
+      "md5": "30cb9044460449f5f93b4ce5eb60f552",
+      "contentSize": "41597698870 B",
+      "description": "Raw experimental measurements for the convex geometry (4491 experiments). One HDF5 file per experiment. The 9 convex experiments shown in sample.zip are not repeated here."
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "sample_zip",
+      "name": "sample.zip",
+      "encodingFormat": "application/zip",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/594669",
+      "md5": "4b61770b34f0517641df613e00a15e56",
+      "contentSize": "173778285 B",
+      "description": "Small sample (one experiment per category, 18 files) for quick tryout and testing without downloading the full dataset. These experiments are not repeated in concave.zip / convex.zip."
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "h5-files",
+      "name": "h5-files",
+      "description": "Every per-experiment HDF5 file across the geometry zips and the sample zip (a non-overlapping partition of all experiments).",
+      "containedIn": [
+        {
+          "@id": "concave_zip"
+        },
+        {
+          "@id": "convex_zip"
+        },
+        {
+          "@id": "sample_zip"
+        }
+      ],
+      "encodingFormat": "application/x-hdf5",
+      "includes": [
+        "**/*.h5"
+      ]
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "process-parameters",
+      "name": "process_parameters",
+      "description": "Per-experiment parameter row from process_parameters.csv. Use `index` to look up the matching HDF5 file.",
+      "key": {
+        "@id": "process-parameters/index"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/index",
+          "name": "index",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "index"
+            }
+          },
+          "description": "Unique experiment identifier; matches the HDF5 filename (e.g. index=42 -> 0042.h5)."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/experiment_id",
+          "name": "experiment_id",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "experiment_id"
+            }
+          },
+          "description": "Repetition index (1..500) within one geometry×blankholder_force×oil_type category."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/category",
+          "name": "category",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "category"
+            }
+          },
+          "description": "Categorical index 0..17 encoding the geometry×blankholder_force×oil_type combination."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/geometry",
+          "name": "geometry",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "geometry"
+            }
+          },
+          "description": "Base part geometry. One of 'concave', 'convex'."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/blankholder_force",
+          "name": "blankholder_force",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "blankholder_force"
+            }
+          },
+          "description": "Blank holder force applied during deep drawing, in kN. One of 100, 300, 500."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/mean_punch_temp",
+          "name": "mean_punch_temp",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "mean_punch_temp"
+            }
+          },
+          "description": "Mean punch temperature recorded during the experiment, in degC."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/oil_type",
+          "name": "oil_type",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "oil_type"
+            }
+          },
+          "description": "Lubrication pattern applied to the blank. One of 'coarse', 'medium', 'fine'."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/has_pointcloud",
+          "name": "has_pointcloud",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "has_pointcloud"
+            }
+          },
+          "description": "True if OP10/OP20 3D point-cloud scans are available for this experiment."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/has_oil",
+          "name": "has_oil",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "has_oil"
+            }
+          },
+          "description": "True if the blank was lubricated (oil applied) for this experiment."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "process-parameters/split",
+          "name": "split",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "process_parameters_csv"
+            },
+            "extract": {
+              "column": "split"
+            }
+          },
+          "description": "Recommended ML data split: 'train' (~80%), 'val' (~10%), 'test' (~10%); deterministic, seed=42."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "field-map",
+      "name": "field-map",
+      "description": "Every raw HDF5 dataset declared once, with its on-disk path and per-file shape. Use-case RecordSets reference entries here.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/force_data",
+          "name": "force_data",
+          "description": "Press force and process signals, time series. Columns: [time (s), load_cell_1..4 (kN), punch_temp (degC), punch_pos (mm), total_force (kN)]. HDF5 path: force/data. Shape (per file): (1140, 8).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "force/data"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/oil_thickness_data",
+          "name": "oil_thickness_data",
+          "description": "Lubricant film measurement along a sensor traverse. Columns: [sensor_position (mm), oil_value (g/m^2)]. HDF5 path: oil_thickness/data. Shape (per file): (421, 2).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "oil_thickness/data"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/pointcloud_op10_luminescence",
+          "name": "pointcloud_op10_luminescence",
+          "description": "Flattened luminescence/intensity buffer of the OP10 scan, pixel-aligned with op10/z. HDF5 path: pointcloud/op10/luminescence. Shape (per file): (6400000).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "pointcloud/op10/luminescence"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/pointcloud_op10_z",
+          "name": "pointcloud_op10_z",
+          "description": "Flattened height (Z) buffer of the OP10 laser scan (after deep drawing), row-major over a y_shape x x_shape grid (see group attributes). Reshape and apply per-pixel calibration to recover a 3D surface (see the rddac preprocessing step). HDF5 path: pointcloud/op10/z. Shape (per file): (6400000).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "pointcloud/op10/z"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/pointcloud_op20_luminescence",
+          "name": "pointcloud_op20_luminescence",
+          "description": "Flattened luminescence/intensity buffer of the OP20 scan, pixel-aligned with op20/z. HDF5 path: pointcloud/op20/luminescence. Shape (per file): (6400000).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "pointcloud/op20/luminescence"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/pointcloud_op20_z",
+          "name": "pointcloud_op20_z",
+          "description": "Flattened height (Z) buffer of the OP20 laser scan (after cutting), row-major over a y_shape x x_shape grid (see group attributes). HDF5 path: pointcloud/op20/z. Shape (per file): (6400000).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "pointcloud/op20/z"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "field-map/sheet_thickness_data",
+          "name": "sheet_thickness_data",
+          "description": "Blank sheet thickness measurement along a sensor traverse. Columns: [sensor_position (mm), sheet_thickness (um)]. HDF5 path: sheet_thickness/data. Shape (per file): (208, 2).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileSet": {
+              "@id": "h5-files"
+            },
+            "extract": {
+              "fileProperty": "content"
+            },
+            "transform": [
+              {
+                "regex": "sheet_thickness/data"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "pointcloud-op10",
+      "name": "pointcloud-op10",
+      "description": "OP10 (after deep drawing) raw laser scan: flattened height (z) and luminescence buffers. Reshape with the group's x_shape/y_shape attrs.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "pointcloud-op10/pointcloud_op10_z",
+          "name": "pointcloud_op10_z",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/pointcloud_op10_z"
+            }
+          },
+          "description": "Flattened OP10 height buffer."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pointcloud-op10/pointcloud_op10_luminescence",
+          "name": "pointcloud_op10_luminescence",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/pointcloud_op10_luminescence"
+            }
+          },
+          "description": "Flattened OP10 luminescence buffer."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "pointcloud-op20",
+      "name": "pointcloud-op20",
+      "description": "OP20 (after cutting) raw laser scan: flattened height (z) and luminescence buffers.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "pointcloud-op20/pointcloud_op20_z",
+          "name": "pointcloud_op20_z",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/pointcloud_op20_z"
+            }
+          },
+          "description": "Flattened OP20 height buffer."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pointcloud-op20/pointcloud_op20_luminescence",
+          "name": "pointcloud_op20_luminescence",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/pointcloud_op20_luminescence"
+            }
+          },
+          "description": "Flattened OP20 luminescence buffer."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "force-curve",
+      "name": "force-curve",
+      "description": "Press force and process signal time series for one experiment.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "force-curve/force_data",
+          "name": "force_data",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/force_data"
+            }
+          },
+          "description": "Force/process signal table; see field-map for column layout."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "sheet-thickness",
+      "name": "sheet-thickness",
+      "description": "Sheet thickness traverse for one experiment (single modality). Measured on the bare blank before lubrication; sensor positions carry a 50 mm offset (raw 50-257 mm).",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "sheet-thickness/sheet_thickness_data",
+          "name": "sheet_thickness_data",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/sheet_thickness_data"
+            }
+          },
+          "description": "Sheet thickness traverse."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "oil-thickness",
+      "name": "oil-thickness",
+      "description": "Oil film traverse for one experiment (single modality). Measured on the blank after lubrication. Only present when has_oil is true (filter with the process-parameters has_oil column).",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "oil-thickness/oil_thickness_data",
+          "name": "oil_thickness_data",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/oil_thickness_data"
+            }
+          },
+          "description": "Oil/lubricant film traverse."
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "thickness",
+      "name": "thickness",
+      "description": "Sheet thickness and lubricant film traverses combined. Requires has_oil=true experiments; use the single-modality views otherwise.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "thickness/sheet_thickness_data",
+          "name": "sheet_thickness_data",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/sheet_thickness_data"
+            }
+          },
+          "description": "Sheet thickness traverse."
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "thickness/oil_thickness_data",
+          "name": "oil_thickness_data",
+          "dataType": "sc:Float",
+          "source": {
+            "field": {
+              "@id": "field-map/oil_thickness_data"
+            }
+          },
+          "description": "Oil/lubricant film traverse."
+        }
+      ]
+    }
+  ]
+}

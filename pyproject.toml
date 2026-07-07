@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rddac"
+version = "0.1.0"
+description = "Python package for the Real Deep Drawing and Cutting (RDDAC) Dataset"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Sebastian Baum"},
+    {name = "Pascal Heinzelmann"},
+]
+keywords = ["deep-drawing", "sheet-metal", "forming", "dataset", "experimental", "measurement"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "h5py>=3.8.0",
+    "matplotlib>=3.7.0",
+    # CLI dependencies
+    "requests>=2.28.0",
+    "humanfriendly>=10.0",
+    "rich>=13.0.0",
+    # Croissant manifest access
+    "mlcroissant>=1.1.0",
+    # Shared dataset machinery (DatasetSpec, streaming, h5 access, spec-aware
+    # CLI) + the matching FEM simulations. <4: major bumps may remove API.
+    "ddacs>=3.2.1,<4",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.0"]
+dev = [
+    "pytest>=7.0.0",
+    "black>=24.0.0",
+    "ruff>=0.3.0",
+    "bumpver>=2023.1129",
+    "pre-commit>=3.6.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-macros-plugin>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/BaumSebastian/RDDAC"
+Documentation = "https://rddac.readthedocs.io"
+Repository = "https://github.com/BaumSebastian/RDDAC"
+
+[project.scripts]
+rddac = "rddac.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rddac*"]
+
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+[tool.bumpver]
+current_version = "0.1.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "Bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = ['version = "{version}"']
+"rddac/__init__.py" = ['__version__ = "{version}"']

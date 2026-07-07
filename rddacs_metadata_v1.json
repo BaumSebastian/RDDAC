@@ -1,0 +1,388 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "dct": "http://purl.org/dc/terms/",
+    "extract": "cr:extract",
+    "references": "cr:references",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "includes": "cr:includes",
+    "recordSet": "cr:recordSet",
+    "repeated": "cr:repeated",
+    "source": "cr:source",
+    "sc": "https://schema.org/",
+    "material": "sc:material",
+    "measurementTechnique": "sc:measurementTechnique",
+    "parameterControlled": "sc:parameterControlled",
+    "PropertyValue": "sc:PropertyValue",
+    "variableMeasured": "sc:variableMeasured",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "isLiveDataset": false,
+    "sameAs": "https://darus.uni-stuttgart.de/api/datasets/export?exporter=Croissant&persistentId=doi:10.18419/DARUS-4801",
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "subField": "cr:subField",
+    "transform": "cr:transform",
+    "wd": "https://www.wikidata.org/wiki/"
+  },
+  "@type": "sc:Dataset",
+  "name": "Deep Drawing and Cutting Simulations Dataset",
+  "description": "The benchmark dataset was generated through a comprehensive simulation study of the deep drawing process for DP600 sheet metal, incorporating variations in geometry, material properties, and process parameters. The simulations were based on the deep drawing of modified quadratic cups with a length of 210 mm and a drawing depth of 30 mm. Three distinct base geometries - Concave, Convex, and Rectangular - were derived from a rectangular reference shape, with key geometric parameters varied in two increments (minimum and maximum). For each geometry, material and process parameters such as the hardening factor (MAT), friction coefficient (FC), sheet thickness (SHTK), and binder force (BF) were systematically varied, resulting in 32,076 unique simulations. Each simulation included stress, strain, thickness distribution, and nodal displacement data for the deep drawing and subsequent springback analysis. The simulation data were stored in HDF5 format, with metadata linking each dataset to its corresponding geometry, material, and process parameters.",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "citeAs": "@data{darus-4801_2025,author = {Baum, Sebastian and Heinzelmann, Pascal},publisher = {DaRUS},title = {Deep Drawing and Cutting Simulations Dataset},year = {2025},url = {https://doi.org/10.18419/DARUS-4801}}",
+  "url": "https://doi.org/10.18419/DARUS-4801",
+  "version": "2.0",
+  "license": "http://creativecommons.org/licenses/by/4.0",
+  "datePublished": "2025-04-02",
+  "dateModified": "2025-09-03",
+  "measurementTechnique": "Finite element simulation (LS-DYNA)",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "@id": "https://orcid.org/0009-0001-0604-8764",
+      "name": "Baum, Sebastian"
+    },
+    {
+      "@type": "sc:Person",
+      "@id": "https://orcid.org/0009-0000-0638-7320",
+      "name": "Heinzelmann, Pascal"
+    }
+  ],
+  "publisher": {
+    "@type": "sc:Organization",
+    "name": "DaRUS",
+    "url": "https://darus.uni-stuttgart.de"
+  },
+  "keywords": [
+    "Computer and Information Science",
+    "Engineering",
+    "Finite Element Method",
+    "Finite Element Analysis",
+    "LS-Dyna",
+    "Deep Drawing",
+    "Springback",
+    "Sheet Metal Forming",
+    "DP600",
+    "Point Cloud",
+    "Simulation"
+  ],
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "metadata.tab",
+      "name": "metadata.tab",
+      "description": "Simulation parameter table with 9000 rows. Columns: id, geometry, blankholder_force, oil_type, experiment_id, mean_punch_temp, category, has_pointcloud, has_oil. Each row links to a corresponding HDF5 file by id.",
+      "contentSize": "",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/479713",
+      "encodingFormat": "text/csv",
+      "md5": "435baddd12dcf187a9f93d15150aebed"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "h5/concave.zip",
+      "name": "concave.zip",
+      "description": "Simulations with concave geometry.",
+      "contentSize": "",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/482832",
+      "encodingFormat": "application/zip",
+      "md5": "a27c627d73fb0c36721c5778d50f1898"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "h5/convex.zip",
+      "name": "convex.zip",
+      "description": "Simulations with convex geometry.",
+      "contentSize": "",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/482834",
+      "encodingFormat": "application/zip",
+      "md5": "da92248809082e1e1a532947530f1cbd"
+    },
+  ],
+  "recordSet": [
+     {
+      "@type": "cr:RecordSet",
+      "@id": "simulation-parameters",
+      "name": "Simulation Parameters",
+      "description": "Per-simulation process and geometry parameters from metadata.tab.",
+      "key": {
+        "@id": "simulation-parameters/id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/id",
+          "name": "id",
+          "description": "Unique simulation identifier. Maps to {ID}.h5 filename.",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "id"  
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/geometry",
+          "name": "geometry",
+          "description": "Geometry of the part: Concave/Convex",
+          "dataType": "",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "geometry"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/blankholder_force",
+          "name": "blankholder_force",
+          "description": "blank holder force (N).",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "blankholder_force"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/oil_type",
+          "name": "oil_type",
+          "description": "Oil type used in the simulation: coarse/fine/medium",
+          "dataType": "",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "oil_type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/experiment_id",
+          "name": "experiment_id",
+          "description": "experiment identifier, maps to {experiment_id}.h5 filename.",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "experiment_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/mean_punch_temp",
+          "name": "mean_punch_temp",
+          "description": "Mean temperature of the punch during the simulation (°C).",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "mean_punch_temp"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/category",
+          "name": "category",
+          "description": "category 0 to 17",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "category"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/has_pointcloud",
+          "name": "has_pointcloud",
+          "description": "Boolean indicating whether a point cloud is available for the simulation.",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "has_pointcloud"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "simulation-parameters/has_oil",
+          "name": "has_oil",
+          "description": "has oil as boolean",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": {
+              "@id": "metadata.tab"
+            },
+            "extract": {
+              "column": "has_oil"
+            }
+          }
+        }
+      ]
+     },
+     {
+  "@type": "cr:RecordSet",
+  "@id": "field-map",
+  "name": "field-map",
+  "description": "Complete HDF5 field registry. Each entry encodes the logical field name, internal HDF5 path, shape, datatype, and whether the field is time-varying. This RecordSet is the single source of truth consumed by DDACSExtractor; no field metadata is hardcoded in the extractor.",
+  "field": [
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/force_data",
+      "name": "force_data",
+      "description": "Shape: (1141, 8). HDF5: force/data.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/oil_thickness_data",
+      "name": "oil_thickness_data",
+      "description": "Shape: (419, 2). HDF5: oil_thickness/data.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/pointcloud_op10_luminescence",
+      "name": "pointcloud_op10_luminescence",
+      "description": "Shape: (6400000,). HDF5: pointcloud/op10/luminescence.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/pointcloud_op10_z",
+      "name": "pointcloud_op10_z",
+      "description": "Shape: (6400000,). HDF5: pointcloud/op10/z.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/pointcloud_op20_luminescence",
+      "name": "pointcloud_op20_luminescence",
+      "description": "Shape: (6400000,). HDF5: pointcloud/op20/luminescence.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/pointcloud_op20_z",
+      "name": "pointcloud_op20_z",
+      "description": "Shape: (6400000,). HDF5: pointcloud/op20/z.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    },
+    {
+      "@type": "cr:Field",
+      "@id": "field-map/sheet_thickness_data",
+      "name": "sheet_thickness_data",
+      "description": "Shape: (208, 2). HDF5: sheet_thickness/data.",
+      "dataType": "sc:Float",
+      "repeated": true,
+      "source": {
+        "fileSet": {
+          "@id": "h5-files"
+        },
+        "extract": {
+          "fileProperty": "content"
+        }
+      }
+    }
+  ]
+}
+  ]
+}
