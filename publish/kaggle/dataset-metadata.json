@@ -1,0 +1,48 @@
+{
+  "title": "RDDAC Teaser",
+  "id": "baumsebastian/rddac-teaser",
+  "subtitle": "Real Deep Drawing and Cutting (RDDAC) Dataset",
+  "description": "A ~174 MB sample of the RDDAC dataset: 18 physical deep-drawing and cutting experiments (one per parameter category) with press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans, plus the Croissant 1.1 manifest, the process parameter table for all 9,000 experiments, and the dataset documentation PDF.\n\nRDDAC is the experimental counterpart to the DDACS simulation dataset (https://doi.org/10.18419/DARUS-4801): same cup geometry, same DP600 steel, same two-stage process — use it to quantify the simulation-to-reality gap or train models on real process data.\n\nThe full release (9,000 experiments, roughly 87 GB of lossless HDF5, with a predefined 7,200 / 900 / 900 train, validation and test split) is hosted on DaRUS with a citable DOI: https://doi.org/10.18419/DARUS-5589\n\nQuickstart:\n\n    pip install rddac\n    import rddac\n    with rddac.open_h5(0, data_dir='data') as f:\n        force = f['force/data'][:]\n\nRunnable tutorials are in the Code tab. Docs: https://rddac.readthedocs.io  Package: https://pypi.org/project/rddac  Source: https://github.com/BaumSebastian/RDDAC\n\nLicense: data CC BY 4.0, code MIT. Please cite the dataset DOI and the paper (10.1007/s12666-026-03870-5).",
+  "licenses": [{ "name": "CC-BY-4.0" }],
+  "keywords": [
+    "engineering",
+    "manufacturing",
+    "physics"
+  ],
+  "resources": [
+    {
+      "path": "README.md",
+      "description": "Overview, quickstart, and links to the full dataset, docs, and package."
+    },
+    {
+      "path": "rddac_documentation.pdf",
+      "description": "Dataset documentation: overview, citation, and pointers to the schema reference and examples."
+    },
+    {
+      "path": "data/metadata.json",
+      "description": "Croissant 1.1 manifest: the machine readable schema (every HDF5 field and CSV column) that rddac.load and mlcroissant consume. Its contentUrls point to DaRUS, so tools can fetch the full data on demand."
+    },
+    {
+      "path": "data/h5/sample.zip",
+      "description": "18 complete experiments, one per parameter category: press force signals, sheet-thickness and oil-film traverses, and the OP10/OP20 3D laser scans."
+    },
+    {
+      "path": "data/process_parameters.csv",
+      "description": "The process parameters plus split metadata for all 9,000 experiments.",
+      "schema": {
+        "fields": [
+          { "name": "index", "type": "integer", "description": "Unique experiment identifier; matches the HDF5 filename (e.g. index=42 -> 0042.h5)." },
+          { "name": "geometry", "type": "string", "description": "Base part geometry: concave or convex." },
+          { "name": "blankholder_force", "type": "integer", "description": "Blank holder force applied during deep drawing, in kN. One of 100, 300, 500." },
+          { "name": "oil_type", "type": "string", "description": "Lubrication pattern applied to the blank: coarse, medium, or fine." },
+          { "name": "experiment_id", "type": "integer", "description": "Repetition index (1..500) within one geometry x blankholder_force x oil_type category." },
+          { "name": "mean_punch_temp", "type": "number", "description": "Mean punch temperature recorded during the experiment, in degC." },
+          { "name": "category", "type": "integer", "description": "Categorical index 0..17 encoding the geometry x blankholder_force x oil_type combination." },
+          { "name": "has_pointcloud", "type": "boolean", "description": "True if OP10/OP20 3D point-cloud scans are available for this experiment." },
+          { "name": "has_oil", "type": "boolean", "description": "True if the blank was lubricated (oil applied) for this experiment." },
+          { "name": "split", "type": "string", "description": "Recommended ML split: train (~80%), val (~10%), test (~10%); deterministic, seed 42." }
+        ]
+      }
+    }
+  ]
+}

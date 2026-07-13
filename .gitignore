@@ -212,3 +212,6 @@ __marimo__/
 
 # Local development scripts
 .helper/
+
+# Teaser publishing: scripts/cards are committed (CI runs them); only staging is local
+publish/.staging/
