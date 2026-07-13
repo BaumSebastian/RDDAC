@@ -41,7 +41,8 @@ NOTEBOOKS = [
     ("03_pytorch.ipynb",         "RDDAC 03 PyTorch Training",            "rddac[torch]"),
     ("04_visualization.ipynb",   "RDDAC 04 Visualization",               "rddac"),
     ("05_loose_h5.ipynb",        "RDDAC 05 Loose HDF5",                  "rddac"),
-    ("06_streaming.ipynb",       "RDDAC 06 Streaming and Numpy Export",  "rddac"),
+    # retitled: the original slug (…-numpy-export) was tombstoned by a failed create
+    ("06_streaming.ipynb",       "RDDAC 06 Streaming and Export",        "rddac"),
 ]
 
 
