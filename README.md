@@ -32,8 +32,7 @@
 
 **[Documentation](https://rddac.readthedocs.io)** · **[Dataset DOI](https://doi.org/10.18419/DARUS-5589)** · **[Paper](https://doi.org/10.1007/s12666-026-03870-5)**
 
-Try the ~174 MB teaser (18 experiments, manifest, parameter table): **[Zenodo](https://zenodo.org/records/21274093)**
-<!-- add Kaggle + Hugging Face teaser links here once those mirrors are public (post DaRUS release) -->
+Try the ~174 MB teaser (18 experiments, manifest, parameter table, runnable tutorials): **[Kaggle](https://www.kaggle.com/datasets/baumsebastian/rddac-teaser)** · **[Hugging Face](https://huggingface.co/datasets/BaumSebastian/rddac-teaser)** · **[Zenodo](https://zenodo.org/records/21274093)**
 
 The `rddac` package ships with the dataset and provides a Croissant native interface: one CLI for the download, one Python module for access, and an optional PyTorch `IterableDataset` for training.
 
