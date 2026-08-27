@@ -37,6 +37,21 @@ MODALITIES = {"force": "force", "sheet": "sheet", "oil": "oil", "pointcloud": "p
 #: Modality name → h5 group it reads and writes.
 GROUPS = {"force": "force", "sheet": "sheet_thickness", "oil": "oil_thickness", "pointcloud": "pointcloud"}
 
+#: Human-readable meaning of the per-experiment status codes in the summary.
+_STATUS_TEXT = {
+    "processed": "processed",
+    "exists": "already in the output file, skipped (use --overwrite to recompute)",
+    "no_group": "skipped, the raw file has no such measurement",
+    "no_file": "skipped, no raw file for this experiment id",
+    "error": "failed (see messages above)",
+}
+_STATUS_ORDER = {"processed": 0, "exists": 1, "no_group": 2, "no_file": 3, "error": 4}
+
+
+def _status_order(item: tuple[str, int]) -> int:
+    return _STATUS_ORDER.get(item[0], 9)
+
+
 #: Root attrs that were dropped from the processed metadata (obsolete counts).
 _OBSOLETE_ROOT_ATTRS = {
     "n_force_measurements",
@@ -269,10 +284,12 @@ def run(
             stats[name][state] = stats[name].get(state, 0) + 1
     stats["elapsed_s"] = round(time.time() - t0, 1)
 
-    summary = "   ".join(
-        f"[bold]{name}[/bold]: " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items()))
-        for name, counts in stats.items()
-        if name != "elapsed_s"
-    )
-    console.print(f"{summary}   [dim]({stats['elapsed_s']} s)[/dim]")
+    for name, counts in stats.items():
+        if name == "elapsed_s":
+            continue
+        parts = [
+            f"{count} {_STATUS_TEXT.get(state, state)}" for state, count in sorted(counts.items(), key=_status_order)
+        ]
+        console.print(f"[bold]{name}[/bold]: " + ", ".join(parts))
+    console.print(f"[dim]finished in {stats['elapsed_s']} s[/dim]")
     return stats

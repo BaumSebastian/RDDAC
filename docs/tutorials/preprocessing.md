@@ -22,8 +22,13 @@ rddac preprocess oil force sheet --data-dir ./data
 Output (with the small bundle on disk):
 
 ```
-oil: 18 processed   force: 18 processed   sheet: 18 processed   (4.2 s)
+oil: 18 processed
+force: 18 processed
+sheet: 18 processed
+finished in 2.8 s
 ```
+
+A second run reports `already in the output file, skipped (use --overwrite to recompute)`; experiments without a measurement (e.g. `has_oil = False`) show up as `skipped, the raw file has no such measurement`.
 
 Output lands in `./data/processed/` as loose `<id>.h5` files. Raw files are never modified.
 
