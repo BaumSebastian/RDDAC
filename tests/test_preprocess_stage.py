@@ -9,8 +9,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from rddac._preprocess.pointcloud import classifier, stage, training
-from rddac._preprocess.runner import run
+pytest.importorskip("scipy", reason="needs the rddac[preprocessing] extra")
+pytest.importorskip("sklearn", reason="needs the rddac[preprocessing] extra")
+from rddac._preprocess.pointcloud import classifier, stage, training  # noqa: E402
+from rddac._preprocess.runner import run  # noqa: E402
 
 H, W = 60, 80
 Z_UNIT = 0.0077545  # matches calibration.json so sensor units are realistic

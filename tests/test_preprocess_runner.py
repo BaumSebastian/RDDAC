@@ -94,7 +94,7 @@ class TestRunner:
 
     def test_missing_simulations_skip_or_fail(self, tmp_path):
         """Pointcloud without simulations: skipped when not named, error when named."""
-        pytest.importorskip("sklearn")
+        pytest.importorskip("sklearn", reason="needs the rddac[preprocessing] extra")
         from rddac._preprocess.runner import run
 
         (tmp_path / "0001.h5").write_bytes(b"")

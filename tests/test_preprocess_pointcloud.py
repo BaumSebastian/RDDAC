@@ -5,12 +5,15 @@ Everything here runs on small synthetic grids — no real dataset needed.
 
 import numpy as np
 import pytest
-from scipy.ndimage import rotate as nd_rotate
-from scipy.ndimage import shift as nd_shift
-from scipy.spatial import cKDTree
 
-from rddac._preprocess.pointcloud import features, geometry
-from rddac._preprocess.pointcloud import registration as reg
+scipy = pytest.importorskip("scipy", reason="needs the rddac[preprocessing] extra")
+pytest.importorskip("sklearn", reason="needs the rddac[preprocessing] extra")
+from scipy.ndimage import rotate as nd_rotate  # noqa: E402
+from scipy.ndimage import shift as nd_shift  # noqa: E402
+from scipy.spatial import cKDTree  # noqa: E402
+
+from rddac._preprocess.pointcloud import features, geometry  # noqa: E402
+from rddac._preprocess.pointcloud import registration as reg  # noqa: E402
 
 
 def _dome(height=60, width=80, peak=20.0):

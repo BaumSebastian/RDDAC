@@ -58,6 +58,7 @@ class TestFigures:
         assert len(fig.axes[0].lines) == 1 + 1, "trace plus cutoff line"
 
     def test_luminescence_four_panels(self):
+        pytest.importorskip("scipy", reason="needs the rddac[preprocessing] extra")
         lumi = np.zeros((40, 60))
         lumi[5:35, 5:45] = 500.0  # large patch (kept)
         lumi[2:4, 50:52] = 300.0  # tiny reflection (removed)
@@ -67,6 +68,7 @@ class TestFigures:
         assert "1 kept, 1 removed" in fig.axes[2].get_title()
 
     def test_pointcloud_two_panels_with_stats(self):
+        pytest.importorskip("scipy", reason="needs the rddac[preprocessing] extra")
         lumi = np.zeros((40, 60))
         lumi[5:35, 5:45] = 500.0
         z = np.where(lumi > 0, 1000.0, 0.0)
@@ -98,6 +100,7 @@ class TestCli:
         assert (out / "sheet_processing.png").is_file()
 
     def test_pointcloud_needs_processed_file(self, tmp_path):
+        pytest.importorskip("scipy", reason="needs the rddac[preprocessing] extra")
         import h5py
 
         lumi = np.zeros((40, 60), dtype=np.float32)
