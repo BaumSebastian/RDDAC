@@ -16,7 +16,7 @@ from rich.markup import escape
 from rich.panel import Panel
 from rich.prompt import Confirm
 
-from ..spec import RDDAC_SPEC
+from ..spec import BRAND_COLOR, RDDAC_SPEC
 from . import config as config_mod
 from .runner import MODALITIES, PROCESSED_MARKER, run
 
@@ -122,7 +122,7 @@ def cmd_preprocess(args: argparse.Namespace) -> None:
                 f"[bold]Experiments:[/bold] {selection}   [bold]Workers:[/bold] {args.workers}\n"
                 "[dim]Raw files are never modified; processed files are written separately.[/dim]",
                 title="RDDAC preprocessing",
-                border_style="cyan",
+                border_style=BRAND_COLOR,
             )
         )
     if not args.yes and not Confirm.ask("Proceed?", default=False, console=console):

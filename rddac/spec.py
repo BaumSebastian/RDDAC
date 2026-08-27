@@ -26,6 +26,9 @@ RDDAC_SPEC = DatasetSpec(
     ),
 )
 
+#: Brand colour of the documentation (docs/stylesheets/extra.css); used for CLI panels.
+BRAND_COLOR = "#7F00FF"
+
 # ── Hyperlinks (kept here so a URL change touches one file) ───────────────────
 DATASET_URL = f"{RDDAC_SPEC.darus_base_url}/dataset.xhtml?persistentId={RDDAC_SPEC.dataset_doi}"
 DOI_URL = f"https://doi.org/{RDDAC_SPEC.dataset_doi.replace('doi:', '')}"

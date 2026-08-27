@@ -86,7 +86,7 @@ rddac preprocess [MODALITY ...] [OPTIONS]
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud`. Without an explicit list, `pointcloud` is skipped with a notice when the DDACS simulations (or the `rddac[preprocessing]` extra) are missing; named explicitly, it fails with an actionable error instead. |
+| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud` (`pointcloud` covers both scan grids, `z` and `luminescence`). Without an explicit list, `pointcloud` is skipped with a notice when the DDACS simulations (or the `rddac[preprocessing]` extra) are missing; named explicitly, it fails with an actionable error instead. |
 
 ### Options
 

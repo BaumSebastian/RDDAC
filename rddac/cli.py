@@ -41,7 +41,7 @@ from rich.panel import Panel
 
 from . import __version__
 from ._preprocess.cli import add_preprocess_parser, cmd_preprocess
-from .spec import DDACS_DATASET_DOI, DDACS_SIM_FILE, RDDAC_SPEC, SIM_SUBDIR
+from .spec import BRAND_COLOR, DDACS_DATASET_DOI, DDACS_SIM_FILE, RDDAC_SPEC, SIM_SUBDIR
 
 DEFAULT_VERSION = RDDAC_SPEC.default_version
 DEFAULT_DATA_DIR = RDDAC_SPEC.default_data_dir
@@ -96,7 +96,7 @@ def _download_simulations(args: argparse.Namespace) -> int:
             f"[bold]Destination:[/bold] {os.path.abspath(sim_dir)}\n"
             "[dim]The matching FEM simulations. Skip with --no-sim.[/dim]",
             title="DDACS simulation reference data",
-            border_style="cyan",
+            border_style=BRAND_COLOR,
         )
     )
 
