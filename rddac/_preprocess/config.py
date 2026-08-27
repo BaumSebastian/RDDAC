@@ -100,7 +100,7 @@ def load(path: str) -> dict[str, dict]:
 def dump() -> str:
     """The complete default configuration as a ready-to-edit TOML string."""
     lines = [
-        "# rddac preprocess configuration — these are the defaults (the",
+        "# rddac preprocess configuration: these are the defaults (the",
         "# reference recipe). Edit values and pass the file via",
         "#   rddac preprocess --config my.toml",
         "# Publish it next to your code to make the variant reproducible.",

@@ -175,29 +175,3 @@ class TestPacking:
         assert packed.dtype == np.uint8
         assert packed[~valid].max() == 0
         assert packed[valid].min() >= 1 and packed[valid].max() == 255
-
-
-class TestManifest:
-    """Processed-layout Croissant manifest generation."""
-
-    def test_written_from_files_on_disk(self, tmp_path):
-        import json
-
-        import h5py
-
-        from rddac._preprocess.manifest import write_manifest
-
-        with h5py.File(tmp_path / "0000.h5", "w") as f:
-            f.create_dataset("force/data", data=np.zeros((600, 8), np.float32))
-            f.create_dataset("pointcloud/op10/z", data=np.zeros((123, 3), np.float32))
-        path = write_manifest(tmp_path)
-        manifest = json.loads(path.read_text())
-        names = [field["name"] for field in manifest["recordSet"][0]["field"]]
-        assert "force_data" in names and "pointcloud_op10_z" in names
-        assert manifest["isBasedOn"].endswith("DARUS-5589")
-        assert write_manifest(tmp_path / "empty") is None or True
-
-    def test_empty_dir_returns_none(self, tmp_path):
-        from rddac._preprocess.manifest import write_manifest
-
-        assert write_manifest(tmp_path) is None

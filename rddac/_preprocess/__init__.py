@@ -12,9 +12,10 @@ Design decisions (2026-08):
 
 - **Raw files are never modified.** Processing reads the raw experiments
   (zips or loose ``.h5``) and writes NEW files to ``<out>/<id>.h5``. The
-  published Croissant manifest therefore stays valid for the raw data; a
-  small generated manifest describes the processed layout (same dataset
-  names as raw, new shapes).
+  processed files keep the raw HDF5 paths, so the published Croissant
+  manifest is the single source of truth for both layers: its views stream
+  the processed directory via ``data_dir=`` (loose ``.h5`` layout). No
+  manifest is generated.
 - **Processed schema** per experiment::
 
       force/data            (600, 8) float32   # all raw columns, window-trimmed

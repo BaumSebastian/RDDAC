@@ -24,7 +24,7 @@ from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TimeRemainingColumn
 
 from . import force
-from .h5_access import open_raw
+from .h5_access import available_ids, open_raw
 
 #: Marker file dropped into the output directory; identifies it as processed
 #: output so re-runs pass the raw-directory guard in the CLI.
@@ -85,6 +85,9 @@ def _experiment_ids(data_dir: str, ids: str | None, split: str | None) -> list[i
     if ids:
         allow = parse_ids(ids)
         selected = [i for i in selected if i in allow]
+    local = available_ids(data_dir)
+    if local is not None:
+        selected = [i for i in selected if i in local]
     return selected
 
 
@@ -212,11 +215,24 @@ def run(
     if not names:
         return {"elapsed_s": 0.0}
 
-    # One-time per-run hooks (main process, before forking workers).
+    # One-time per-run hooks (main process, before forking workers). A stage
+    # whose prerequisites are missing (e.g. pointcloud without simulations)
+    # is skipped with a notice unless the user named it explicitly.
+    ready: list[str] = []
     for name in names:
         module = modality_module(name)
         if hasattr(module, "preflight"):
-            module.preflight(data_dir, config.get(name, {}), console=console, rebuild_models=rebuild_models)
+            try:
+                module.preflight(data_dir, config.get(name, {}), console=console, rebuild_models=rebuild_models)
+            except FileNotFoundError as exc:
+                if not skip_unavailable:
+                    raise
+                console.print(f"[yellow]{name}: {exc} — skipped[/yellow]")
+                continue
+        ready.append(name)
+    names = ready
+    if not names:
+        return {"elapsed_s": 0.0}
 
     experiment_ids = _experiment_ids(data_dir, ids, split)
     os.makedirs(out_dir, exist_ok=True)
@@ -254,13 +270,6 @@ def run(
             state = state.split(":")[0]  # collapse per-file error messages
             stats[name][state] = stats[name].get(state, 0) + 1
     stats["elapsed_s"] = round(time.time() - t0, 1)
-
-    try:
-        from .manifest import write_manifest
-
-        write_manifest(out_dir)
-    except Exception as exc:  # manifest generation must never fail a run
-        console.print(f"[yellow]processed manifest not written: {exc}[/yellow]")
 
     summary = "   ".join(
         f"[bold]{name}[/bold]: " + ", ".join(f"{v} {k}" for k, v in sorted(counts.items()))

@@ -116,17 +116,21 @@ def cmd_preprocess(args: argparse.Namespace) -> None:
             )
         )
 
-    run(
-        names,
-        data_dir=args.data_dir,
-        out_dir=out_dir,
-        ids=args.ids,
-        split=args.split,
-        workers=args.workers,
-        overwrite=args.overwrite,
-        quiet=args.quiet,
-        console=console,
-        config=cfg,
-        skip_unavailable=not args.modalities,
-        rebuild_models=args.rebuild_models,
-    )
+    try:
+        run(
+            names,
+            data_dir=args.data_dir,
+            out_dir=out_dir,
+            ids=args.ids,
+            split=args.split,
+            workers=args.workers,
+            overwrite=args.overwrite,
+            quiet=args.quiet,
+            console=console,
+            config=cfg,
+            skip_unavailable=not args.modalities,
+            rebuild_models=args.rebuild_models,
+        )
+    except FileNotFoundError as exc:  # explicit stage with missing prerequisites (e.g. simulations)
+        console.print(f"[red]{escape(str(exc))}[/red]")
+        raise SystemExit(2)

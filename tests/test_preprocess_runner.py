@@ -3,6 +3,7 @@
 import h5py
 import numpy as np
 import pandas as pd
+import pytest
 
 from rddac._preprocess import config, force, oil
 from rddac._preprocess.runner import PROCESSED_MARKER, parse_ids, run
@@ -72,6 +73,46 @@ class TestRunner:
         stats = run(["force", "sheet", "oil"], data_dir=str(raw), out_dir=str(out), quiet=True)
         assert stats["force"] == {"exists": 2}
 
+    def test_selection_limited_to_locally_available_files(self, tmp_path):
+        """A full process_parameters.csv with a partial bundle must not try every id."""
+        import zipfile
+
+        import pandas as pd
+
+        from rddac._preprocess.runner import _experiment_ids
+
+        pd.DataFrame({"index": range(50), "split": ["train"] * 50}).to_csv(
+            tmp_path / "process_parameters.csv", index=False
+        )
+        (tmp_path / "h5").mkdir()
+        with zipfile.ZipFile(tmp_path / "h5" / "sample.zip", "w") as zf:
+            zf.writestr("0007.h5", b"")
+            zf.writestr("0042.h5", b"")
+        (tmp_path / "0003.h5").write_bytes(b"")
+        assert _experiment_ids(str(tmp_path), None, None) == [3, 7, 42]
+        assert _experiment_ids(str(tmp_path), "0-10", "train") == [3, 7]
+
+    def test_missing_simulations_skip_or_fail(self, tmp_path):
+        """Pointcloud without simulations: skipped when not named, error when named."""
+        pytest.importorskip("sklearn")
+        from rddac._preprocess.runner import run
+
+        (tmp_path / "0001.h5").write_bytes(b"")
+        stats = run(["pointcloud"], str(tmp_path), str(tmp_path / "out"), quiet=True, skip_unavailable=True)
+        assert stats == {"elapsed_s": 0.0}
+        with pytest.raises(FileNotFoundError, match="simulations not found"):
+            run(["pointcloud"], str(tmp_path), str(tmp_path / "out"), quiet=True, skip_unavailable=False)
+
+    def test_no_manifest_generated(self, tmp_path):
+        """The published Croissant manifest is the single source of truth; none is written."""
+        raw = tmp_path / "raw"
+        raw.mkdir()
+        _make_raw_dir(raw, ids=(0,))
+        out = tmp_path / "processed"
+        run(["oil"], data_dir=str(raw), out_dir=str(out), quiet=True)
+        assert not (out / "metadata.json").exists()
+        assert sorted(p.name for p in out.iterdir()) == [PROCESSED_MARKER, "0000.h5"]
+
     def test_ids_and_split_selection(self, tmp_path):
         raw = tmp_path / "raw"
         raw.mkdir()
@@ -92,19 +133,3 @@ class TestRunner:
             assert f["oil_thickness/data"].shape == (100, 2)
             assert f["oil_thickness"].attrs["max_sensor_position"] == 100
             assert f["oil_thickness"].attrs["hampel_k"] == config.DEFAULTS["oil"]["hampel_k"]
-
-    def test_manifest_written_and_reflects_disk(self, tmp_path):
-        import json
-
-        raw = tmp_path / "raw"
-        raw.mkdir()
-        _make_raw_dir(raw, ids=(0,))
-        out = tmp_path / "processed"
-        run(["oil"], data_dir=str(raw), out_dir=str(out), quiet=True)
-        manifest = json.loads((out / "metadata.json").read_text())
-        names = [f["name"] for f in manifest["recordSet"][0]["field"]]
-        assert "oil_thickness_data" in names
-        run(["force"], data_dir=str(raw), out_dir=str(out), quiet=True)
-        manifest = json.loads((out / "metadata.json").read_text())
-        names = [f["name"] for f in manifest["recordSet"][0]["field"]]
-        assert "force_data" in names, "manifest regenerated after the second run"
