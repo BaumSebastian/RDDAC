@@ -1,7 +1,5 @@
 """Test package installation and imports."""
 
-import pytest
-
 
 class TestInstallation:
     """Tests for package installation."""

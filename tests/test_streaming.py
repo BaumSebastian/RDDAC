@@ -17,9 +17,7 @@ class TestIterViewZippedLayout:
     into geometry zips (concave.zip / convex.zip), like the published dataset."""
 
     def test_yields_one_record_per_experiment(self, synthetic_data_dir):
-        records = list(
-            rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir))
-        )
+        records = list(rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir)))
         assert len(records) == 3
         for rec in records:
             # `_sim_id` is the private scratch key iter_view attaches to each record.
@@ -27,9 +25,7 @@ class TestIterViewZippedLayout:
             assert rec["force_data"].shape == (N_FORCE, 8)
 
     def test_sim_ids_are_attached_in_csv_order(self, synthetic_data_dir):
-        records = list(
-            rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir))
-        )
+        records = list(rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir)))
         assert [rec["_sim_id"] for rec in records] == [1, 2, 3]
 
     def test_sim_ids_filter(self, synthetic_data_dir):
@@ -83,9 +79,7 @@ class TestIterViewLooseLayout:
         (out / "h5").mkdir(parents=True)
         # Copy manifest + csv unchanged.
         (out / "metadata.json").write_text((synthetic_data_dir / "metadata.json").read_text())
-        (out / "process_parameters.csv").write_text(
-            (synthetic_data_dir / "process_parameters.csv").read_text()
-        )
+        (out / "process_parameters.csv").write_text((synthetic_data_dir / "process_parameters.csv").read_text())
         # Unpack each zip into h5/<0-padded id>.h5.
         for zp in synthetic_data_dir.glob("*.zip"):
             with zipfile.ZipFile(zp) as zf:
@@ -97,9 +91,7 @@ class TestIterViewLooseLayout:
         assert names == ["0001.h5", "0002.h5", "0003.h5"]
 
     def test_yields_one_record_per_experiment(self, loose_data_dir):
-        records = list(
-            rddac.streaming.iter_view("force-curve", data_dir=str(loose_data_dir))
-        )
+        records = list(rddac.streaming.iter_view("force-curve", data_dir=str(loose_data_dir)))
         assert len(records) == 3
         for rec in records:
             assert rec["force_data"].shape == (N_FORCE, 8)
@@ -114,9 +106,7 @@ class TestIterViewLooseLayout:
         assert set(index) == {1, 2, 3}
         # Every indexed experiment should resolve to a `.h5` file, not a `.zip`.
         for sim_id, path in index.items():
-            assert path.endswith(
-                ".h5"
-            ), f"experiment {sim_id} resolved to {path!r}; loose layout should win"
+            assert path.endswith(".h5"), f"experiment {sim_id} resolved to {path!r}; loose layout should win"
 
     def test_index_parses_zero_padded_stems(self, synthetic_data_dir):
         """`0001.h5` must index as experiment 1 (int of the padded stem)."""
@@ -157,17 +147,17 @@ class TestIterViewDatasetKwarg:
     def test_metadata_columns_joined_from_csv(self, synthetic_data_dir):
         """Views mixing field-map and process-parameters sources stream both."""
         ds = rddac.load(data_dir=str(synthetic_data_dir))
-        rddac.add_view(ds, "force-signals", fields={
-            "force": "force_data",
-            "geometry": "process-parameters/geometry",
-            "blankholder_force": "process-parameters/blankholder_force",
-            "split": "process-parameters/split",
-        })
-        records = list(
-            rddac.streaming.iter_view(
-                "force-signals", data_dir=str(synthetic_data_dir), dataset=ds
-            )
+        rddac.add_view(
+            ds,
+            "force-signals",
+            fields={
+                "force": "force_data",
+                "geometry": "process-parameters/geometry",
+                "blankholder_force": "process-parameters/blankholder_force",
+                "split": "process-parameters/split",
+            },
         )
+        records = list(rddac.streaming.iter_view("force-signals", data_dir=str(synthetic_data_dir), dataset=ds))
         assert len(records) == 3
         by_id = {rec["_sim_id"]: rec for rec in records}
         assert by_id[1]["geometry"] == "concave"
@@ -178,15 +168,19 @@ class TestIterViewDatasetKwarg:
 
     def test_all_modalities_view_streams_every_modality(self, synthetic_data_dir):
         ds = rddac.load(data_dir=str(synthetic_data_dir))
-        rddac.add_view(ds, "full-experiment", fields={
-            "force": "force_data",
-            "sheet_thickness": "sheet_thickness_data",
-            "oil_thickness": "oil_thickness_data",
-            "op10_z": "pointcloud_op10_z",
-            "op10_luminescence": "pointcloud_op10_luminescence",
-            "op20_z": "pointcloud_op20_z",
-            "op20_luminescence": "pointcloud_op20_luminescence",
-        })
+        rddac.add_view(
+            ds,
+            "full-experiment",
+            fields={
+                "force": "force_data",
+                "sheet_thickness": "sheet_thickness_data",
+                "oil_thickness": "oil_thickness_data",
+                "op10_z": "pointcloud_op10_z",
+                "op10_luminescence": "pointcloud_op10_luminescence",
+                "op20_z": "pointcloud_op20_z",
+                "op20_luminescence": "pointcloud_op20_luminescence",
+            },
+        )
         rec = next(
             iter(
                 rddac.streaming.iter_view(
@@ -225,9 +219,7 @@ class TestExportToNumpy:
         for p in paths.values():
             assert p.is_file()
 
-        streamed = list(
-            rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir))
-        )
+        streamed = list(rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir)))
         sim_ids = np.load(paths["sim_ids"])
         force = np.load(paths["force_data"], mmap_mode="r")
         assert force.shape == (len(streamed), *streamed[0]["force_data"].shape)
@@ -318,10 +310,7 @@ class TestExportToNumpyPerSim:
             data_dir=str(synthetic_data_dir),
         )
         streamed = {
-            rec["_sim_id"]: rec
-            for rec in rddac.streaming.iter_view(
-                "force-curve", data_dir=str(synthetic_data_dir)
-            )
+            rec["_sim_id"]: rec for rec in rddac.streaming.iter_view("force-curve", data_dir=str(synthetic_data_dir))
         }
         for sim_id, rec in streamed.items():
             with np.load(out / f"{sim_id}.npz") as npz:

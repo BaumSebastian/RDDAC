@@ -13,6 +13,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from rddac.cli import (
+    DEFAULT_VERSION,
+    SMALL_TEST_FILES,
     __version__,
     _dataset_title,
     _file_info,
@@ -21,7 +23,6 @@ from rddac.cli import (
     cmd_info,
     main,
 )
-from rddac.cli import DEFAULT_VERSION, SMALL_TEST_FILES
 
 
 def _download_args(**overrides) -> argparse.Namespace:
@@ -320,9 +321,7 @@ class TestCmdDownload:
     @patch("ddacs.cli._api_get")
     def test_cmd_download_no_matching_files(self, mock_api_get, capsys):
         """Test download when no files match criteria."""
-        mock_api_get.return_value = _version_payload(
-            [{"dataFile": {"filename": "other.csv", "filesize": 100}}]
-        )
+        mock_api_get.return_value = _version_payload([{"dataFile": {"filename": "other.csv", "filesize": 100}}])
 
         cmd_download(_download_args(files=["nonexistent.csv"]))
 
@@ -358,14 +357,10 @@ class TestCmdDownload:
 
     @patch("ddacs.cli.requests.get")
     @patch("ddacs.cli._api_get")
-    def test_cmd_download_full_delegates_ddacs_sims(
-        self, mock_api_get, mock_requests_get, tmp_path, capsys
-    ):
+    def test_cmd_download_full_delegates_ddacs_sims(self, mock_api_get, mock_requests_get, tmp_path, capsys):
         """Without --no-sim the simulation fetch is delegated to the installed
         `ddacs` CLI (subprocess); only ONE DaRUS metadata fetch happens here."""
-        rddac_payload = _version_payload(
-            [{"dataFile": {"id": 1, "filename": "test.csv", "filesize": 100}}]
-        )
+        rddac_payload = _version_payload([{"dataFile": {"id": 1, "filename": "test.csv", "filesize": 100}}])
         mock_api_get.side_effect = [rddac_payload]
 
         mock_response = MagicMock()
@@ -381,21 +376,24 @@ class TestCmdDownload:
 
         assert mock_api_get.call_count == 1  # only the RDDAC metadata fetch
         delegated = mock_run.call_args[0][0]
-        assert delegated[1:8] == ["-m", "ddacs.cli", "download", "--files", "rddac.zip",
-                                  "metadata.json", "process_parameters.csv"]
+        assert delegated[1:8] == [
+            "-m",
+            "ddacs.cli",
+            "download",
+            "--files",
+            "rddac.zip",
+            "metadata.json",
+            "process_parameters.csv",
+        ]
         captured = capsys.readouterr()
         assert "rddac.zip" in captured.out  # the sim panel rendered
 
     @patch("ddacs.cli.requests.get")
     @patch("ddacs.cli._api_get")
-    def test_cmd_download_sims_without_ddacs_installed(
-        self, mock_api_get, mock_requests_get, tmp_path, capsys
-    ):
+    def test_cmd_download_sims_without_ddacs_installed(self, mock_api_get, mock_requests_get, tmp_path, capsys):
         """When `ddacs` is not installed, the sim leg prints install
         instructions instead of failing."""
-        rddac_payload = _version_payload(
-            [{"dataFile": {"id": 1, "filename": "test.csv", "filesize": 100}}]
-        )
+        rddac_payload = _version_payload([{"dataFile": {"id": 1, "filename": "test.csv", "filesize": 100}}])
         mock_api_get.side_effect = [rddac_payload]
 
         mock_response = MagicMock()
@@ -415,9 +413,7 @@ class TestCmdDownload:
     @patch("ddacs.cli._api_get")
     def test_cmd_download_small_skips_sims(self, mock_api_get, mock_requests_get, tmp_path):
         """--small implies the DDACS simulations are not fetched."""
-        mock_api_get.return_value = _version_payload(
-            [{"dataFile": {"id": 1, "filename": "sample.zip", "filesize": 4}}]
-        )
+        mock_api_get.return_value = _version_payload([{"dataFile": {"id": 1, "filename": "sample.zip", "filesize": 4}}])
 
         zip_bytes = b"PK\x05\x06" + b"\x00" * 18  # empty zip
         mock_response = MagicMock()

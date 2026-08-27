@@ -110,8 +110,14 @@ def _make_synthetic_h5(exp_id: int) -> bytes:
 
         g = f.create_group("force")
         g.attrs["columns"] = [
-            "time", "load_cell_1", "load_cell_2", "load_cell_3", "load_cell_4",
-            "punch_temp", "punch_pos", "total_force",
+            "time",
+            "load_cell_1",
+            "load_cell_2",
+            "load_cell_3",
+            "load_cell_4",
+            "punch_temp",
+            "punch_pos",
+            "total_force",
         ]
         g.create_dataset("data", data=rng.random((N_FORCE, 8)).astype(np.float32))
 
@@ -126,9 +132,7 @@ def _make_synthetic_h5(exp_id: int) -> bytes:
             g.attrs["x_shape"] = X_SHAPE
             g.attrs["y_shape"] = Y_SHAPE
             g.create_dataset("z", data=rng.random(X_SHAPE * Y_SHAPE).astype(np.float32))
-            g.create_dataset(
-                "luminescence", data=rng.random(X_SHAPE * Y_SHAPE).astype(np.float32)
-            )
+            g.create_dataset("luminescence", data=rng.random(X_SHAPE * Y_SHAPE).astype(np.float32))
     return buf.getvalue()
 
 
@@ -276,8 +280,7 @@ def synthetic_data_dir(tmp_path_factory) -> Path:
     rows = [header]
     for exp_id, (geometry, category, bhf, oil_type, split) in _SYNTHETIC_EXPERIMENTS.items():
         rows.append(
-            f"{exp_id},{exp_id + 1},{category},{geometry},{bhf},"
-            f"{20.0 + exp_id},{oil_type},True,True,{split}"
+            f"{exp_id},{exp_id + 1},{category},{geometry},{bhf}," f"{20.0 + exp_id},{oil_type},True,True,{split}"
         )
     (out / "process_parameters.csv").write_text("\n".join(rows) + "\n")
 
@@ -318,10 +321,7 @@ def small_data_dir(tmp_path_factory) -> Path:
         return cache
 
     if not os.environ.get("RDDAC_RUN_DOWNLOAD_TESTS"):
-        pytest.skip(
-            f"small bundle not cached at {cache}; set RDDAC_RUN_DOWNLOAD_TESTS=1 "
-            "to download it (~174 MB)"
-        )
+        pytest.skip(f"small bundle not cached at {cache}; set RDDAC_RUN_DOWNLOAD_TESTS=1 " "to download it (~174 MB)")
 
     out = cache if os.access(cache.parent, os.W_OK) else tmp_path_factory.mktemp("rddac_small")
     cmd = [sys.executable, "-m", "rddac.cli"]
@@ -334,9 +334,7 @@ def small_data_dir(tmp_path_factory) -> Path:
         cmd.append(":draft")
 
     try:
-        res = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=300, cwd=str(_REPO_ROOT)
-        )
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=300, cwd=str(_REPO_ROOT))
     except subprocess.TimeoutExpired:
         pytest.skip("rddac download --small timed out")
     if res.returncode != 0:

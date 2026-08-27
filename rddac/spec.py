@@ -27,9 +27,7 @@ RDDAC_SPEC = DatasetSpec(
 )
 
 # ── Hyperlinks (kept here so a URL change touches one file) ───────────────────
-DATASET_URL = (
-    f"{RDDAC_SPEC.darus_base_url}/dataset.xhtml?persistentId={RDDAC_SPEC.dataset_doi}"
-)
+DATASET_URL = f"{RDDAC_SPEC.darus_base_url}/dataset.xhtml?persistentId={RDDAC_SPEC.dataset_doi}"
 DOI_URL = f"https://doi.org/{RDDAC_SPEC.dataset_doi.replace('doi:', '')}"
 GITHUB_URL = "https://github.com/BaumSebastian/RDDAC"
 DOCS_URL = "https://rddac.readthedocs.io"
@@ -40,8 +38,6 @@ DOCS_URL = "https://rddac.readthedocs.io"
 # delegating to the installed `ddacs` CLI. They are the RDDAC sub-study subset
 # published in the DDACS dataset as a single zip.
 DDACS_DATASET_DOI = "doi:10.18419/DARUS-4801"
-DDACS_DATASET_URL = (
-    f"{RDDAC_SPEC.darus_base_url}/dataset.xhtml?persistentId={DDACS_DATASET_DOI}"
-)
+DDACS_DATASET_URL = f"{RDDAC_SPEC.darus_base_url}/dataset.xhtml?persistentId={DDACS_DATASET_DOI}"
 DDACS_SIM_FILE = "rddac.zip"
 SIM_SUBDIR = "simulation"  # local subdirectory the simulations download into

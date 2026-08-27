@@ -14,15 +14,9 @@ from typing import Any
 
 import mlcroissant as mlc
 from ddacs import croissant as _ddacs_croissant
-from ddacs.croissant import (  # noqa: F401  — shared, dataset-agnostic API
+from ddacs.croissant import (  # noqa: F401  — shared, dataset-agnostic API; noqa: F401  — internals used by tests/tools
     FieldSpec,
     TimestepSpec,
-    add_view,
-    dataset_name,
-    field_map,
-    process_parameters_descriptions,
-)
-from ddacs.croissant import (  # noqa: F401  — internals used by tests/tools
     _build_mapping,
     _load_jsonld_dict,
     _lookup_data_type,
@@ -30,6 +24,10 @@ from ddacs.croissant import (  # noqa: F401  — internals used by tests/tools
     _record_set,
     _resolve_field_id,
     _slicing_to_jsonpath,
+    add_view,
+    dataset_name,
+    field_map,
+    process_parameters_descriptions,
 )
 
 from .spec import RDDAC_SPEC

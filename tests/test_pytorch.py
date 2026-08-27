@@ -79,9 +79,7 @@ class TestDatasetKwarg:
 
         ds = rddac.load(data_dir=str(synthetic_data_dir))
         rddac.add_view(ds, "force-rows", fields={"rows": ("force_data", [0, 1])})
-        ds_iter = RDDACDataset(
-            view="force-rows", data_dir=str(synthetic_data_dir), dataset=ds
-        )
+        ds_iter = RDDACDataset(view="force-rows", data_dir=str(synthetic_data_dir), dataset=ds)
         for rec in ds_iter:
             assert rec["rows"].shape == (2, 8)
 

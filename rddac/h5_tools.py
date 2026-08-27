@@ -45,6 +45,4 @@ def open_h5(
     Raises:
         FileNotFoundError: No locally mapped zip contained the requested h5.
     """
-    return _ddacs_h5_tools.open_h5(
-        experiment_id, source=source, data_dir=data_dir, dataset=dataset, spec=RDDAC_SPEC
-    )
+    return _ddacs_h5_tools.open_h5(experiment_id, source=source, data_dir=data_dir, dataset=dataset, spec=RDDAC_SPEC)

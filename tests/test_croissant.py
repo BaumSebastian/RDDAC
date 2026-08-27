@@ -88,8 +88,16 @@ class TestLoadSynthetic:
         ds = rddac.load(data_dir=str(synthetic_data_dir))
         desc = process_parameters_descriptions(ds)
         assert set(desc) == {
-            "index", "experiment_id", "category", "geometry", "blankholder_force",
-            "mean_punch_temp", "oil_type", "has_pointcloud", "has_oil", "split",
+            "index",
+            "experiment_id",
+            "category",
+            "geometry",
+            "blankholder_force",
+            "mean_punch_temp",
+            "oil_type",
+            "has_pointcloud",
+            "has_oil",
+            "split",
         }
 
     def test_field_map_helper(self, synthetic_data_dir):

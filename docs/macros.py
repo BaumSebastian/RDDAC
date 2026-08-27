@@ -25,8 +25,8 @@ SMALL_TEST_FILES = list(RDDAC_SPEC.small_test_files)
 EXPERIMENT_COUNT = 9_000
 EXPERIMENTS_PER_GEOMETRY = 4_500
 CATEGORY_COUNT = 18
-MISSING_POINTCLOUD = 10   # experiments with has_pointcloud=False
-MISSING_OIL = 123         # experiments with has_oil=False
+MISSING_POINTCLOUD = 10  # experiments with has_pointcloud=False
+MISSING_OIL = 123  # experiments with has_oil=False
 
 # The matching FEM simulations live in the DDACS dataset (rddac.zip there), so
 # their size is not in RDDAC's manifest. The one display value maintained by
@@ -47,11 +47,13 @@ def _file_objects() -> list[dict]:
         if d.get("@type") != "cr:FileObject":
             continue
         size = d.get("contentSize", "")  # "12345 B"
-        out.append({
-            "name": d["name"],
-            "bytes": int(size.split()[0]) if size.endswith(" B") else None,
-            "description": d.get("description", ""),
-        })
+        out.append(
+            {
+                "name": d["name"],
+                "bytes": int(size.split()[0]) if size.endswith(" B") else None,
+                "description": d.get("description", ""),
+            }
+        )
     return out
 
 
@@ -67,6 +69,7 @@ def _fmt_size(n: int) -> str:
 def _size_of(*names: str) -> int:
     by_name = {f["name"]: f["bytes"] for f in _file_objects() if f["bytes"]}
     return sum(by_name.get(n, 0) for n in names)
+
 
 # ---------------------------------------------------------------------------
 # Croissant manifest helpers (read at build time, not coupled to the values
@@ -141,12 +144,17 @@ def define_env(env):
     @env.macro
     def darus_files_table() -> str:
         rows = [
-            [f"`{f['name']}`", _fmt_size(f["bytes"]) if f["bytes"] else "", f["description"]]
-            for f in _file_objects()
+            [f"`{f['name']}`", _fmt_size(f["bytes"]) if f["bytes"] else "", f["description"]] for f in _file_objects()
         ]
         # Files DaRUS hosts alongside the data, not part of the manifest's
         # distribution (a manifest cannot describe itself).
-        rows.append(["`metadata.json`", "", "The Croissant 1.1 manifest — the machine readable schema of this table and everything in the HDF5 files."])
+        rows.append(
+            [
+                "`metadata.json`",
+                "",
+                "The Croissant 1.1 manifest — the machine readable schema of this table and everything in the HDF5 files.",
+            ]
+        )
         rows.append(["`rddac_documentation.pdf`", "", "Standalone dataset documentation."])
         return _md_table(["File", "Size", "Contents"], rows)
 
@@ -193,8 +201,7 @@ def define_env(env):
     @env.macro
     def use_case_record_sets() -> str:
         """The task-specific RecordSets (everything but the two schema sets)."""
-        ids = [rs.id for rs in _dataset().metadata.record_sets
-               if rs.id not in ("process-parameters", "field-map")]
+        ids = [rs.id for rs in _dataset().metadata.record_sets if rs.id not in ("process-parameters", "field-map")]
         return ", ".join(f"`{i}`" for i in ids)
 
     @env.macro

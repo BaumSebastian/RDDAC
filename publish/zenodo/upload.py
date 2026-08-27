@@ -65,9 +65,9 @@ def new_draft(record_id: str | None) -> dict:
         print("creating a NEW record (no record_id in metadata.json yet)")
         return _check(requests.post(f"{BASE}/api/deposit/depositions", json={}, headers=AUTH))
     print(f"record {record_id}: creating new-version draft")
-    draft_url = _check(
-        requests.post(f"{BASE}/api/deposit/depositions/{record_id}/actions/newversion", headers=AUTH)
-    )["links"]["latest_draft"]
+    draft_url = _check(requests.post(f"{BASE}/api/deposit/depositions/{record_id}/actions/newversion", headers=AUTH))[
+        "links"
+    ]["latest_draft"]
     draft = _check(requests.get(draft_url, headers=AUTH))
     # a new-version draft inherits the old files — drop them for a clean re-upload
     for f in draft.get("files", []):
@@ -128,8 +128,10 @@ def main() -> None:
         print("publish on the site, or re-run with --publish")
 
     if config.get("record_id") is None:
-        print('\nNOTE: after the first publish, set "record_id" in '
-              "publish/zenodo/metadata.json so future runs create new versions.")
+        print(
+            '\nNOTE: after the first publish, set "record_id" in '
+            "publish/zenodo/metadata.json so future runs create new versions."
+        )
 
 
 if __name__ == "__main__":

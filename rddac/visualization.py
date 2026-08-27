@@ -30,8 +30,14 @@ SCAN_Y_SHAPE = 2000
 
 # Force table column layout (see the `columns` attr on the h5 `force` group).
 FORCE_COLUMNS = (
-    "time", "load_cell_1", "load_cell_2", "load_cell_3", "load_cell_4",
-    "punch_temp", "punch_pos", "total_force",
+    "time",
+    "load_cell_1",
+    "load_cell_2",
+    "load_cell_3",
+    "load_cell_4",
+    "punch_temp",
+    "punch_pos",
+    "total_force",
 )
 
 DEFAULT_DPI = 150
@@ -176,8 +182,7 @@ def plot_point_cloud(
     if ax is None:
         fig = plt.figure(figsize=figsize or (10, 8), dpi=DEFAULT_DPI)
         ax = fig.add_subplot(projection="3d")
-    sc = ax.scatter(points[:, 0], points[:, 1], points[:, 2],
-                    c=values, cmap=cmap, vmin=vmin, vmax=vmax, s=point_size)
+    sc = ax.scatter(points[:, 0], points[:, 1], points[:, 2], c=values, cmap=cmap, vmin=vmin, vmax=vmax, s=point_size)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")

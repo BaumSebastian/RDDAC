@@ -34,17 +34,14 @@ import subprocess
 import sys
 
 from ddacs import cli as _ddacs_cli
-from ddacs.cli import _dataset_title  # noqa: F401  — identical helper, re-exported for tests
+from ddacs.cli import (  # noqa: F401  — identical helper, re-exported for tests
+    _dataset_title,
+)
 from rich.panel import Panel
 
 from . import __version__
 from ._preprocess.cli import add_preprocess_parser, cmd_preprocess
-from .spec import (
-    DDACS_DATASET_DOI,
-    DDACS_SIM_FILE,
-    RDDAC_SPEC,
-    SIM_SUBDIR,
-)
+from .spec import DDACS_DATASET_DOI, DDACS_SIM_FILE, RDDAC_SPEC, SIM_SUBDIR
 
 DEFAULT_VERSION = RDDAC_SPEC.default_version
 DEFAULT_DATA_DIR = RDDAC_SPEC.default_data_dir
@@ -93,11 +90,15 @@ def _download_simulations(args: argparse.Namespace) -> int:
     """
     sim_dir = os.path.join(args.out, SIM_SUBDIR)
     console.print()
-    console.print(Panel(
-        f"[bold]Source:[/bold] DDACS {DDACS_DATASET_DOI}\n[bold]File:[/bold] {DDACS_SIM_FILE}\n"
-        f"[bold]Destination:[/bold] {os.path.abspath(sim_dir)}\n"
-        "[dim]The matching FEM simulations. Skip with --no-sim.[/dim]",
-        title="DDACS simulation reference data", border_style="cyan"))
+    console.print(
+        Panel(
+            f"[bold]Source:[/bold] DDACS {DDACS_DATASET_DOI}\n[bold]File:[/bold] {DDACS_SIM_FILE}\n"
+            f"[bold]Destination:[/bold] {os.path.abspath(sim_dir)}\n"
+            "[dim]The matching FEM simulations. Skip with --no-sim.[/dim]",
+            title="DDACS simulation reference data",
+            border_style="cyan",
+        )
+    )
 
     if importlib.util.find_spec("ddacs") is None:
         console.print(
@@ -112,9 +113,18 @@ def _download_simulations(args: argparse.Namespace) -> int:
     # self-contained DDACS data dir: ddacs.load(data_dir="<out>/simulation")
     # resolves the DDACS manifest locally and cannot pick up RDDAC's
     # metadata.json from the parent directory.
-    cmd = [sys.executable, "-m", "ddacs.cli", "download",
-           "--files", DDACS_SIM_FILE, "metadata.json", "process_parameters.csv",
-           "--out", sim_dir]
+    cmd = [
+        sys.executable,
+        "-m",
+        "ddacs.cli",
+        "download",
+        "--files",
+        DDACS_SIM_FILE,
+        "metadata.json",
+        "process_parameters.csv",
+        "--out",
+        sim_dir,
+    ]
     if args.yes:
         cmd.append("-y")
     if getattr(args, "quiet", False):
@@ -134,7 +144,8 @@ def _download_simulations(args: argparse.Namespace) -> int:
 def main() -> None:
     """CLI entry point for RDDAC dataset commands."""
     parser = argparse.ArgumentParser(
-        prog="rddac", description="RDDAC Dataset CLI - Download experimental data from DaRUS")
+        prog="rddac", description="RDDAC Dataset CLI - Download experimental data from DaRUS"
+    )
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--token", help="DaRUS API token (for draft access)")
     sub = parser.add_subparsers(dest="command", help="Command")
@@ -142,17 +153,15 @@ def main() -> None:
     sub.add_parser("info", help="Show dataset info and versions")
 
     dl = sub.add_parser("download", help="Download dataset files")
-    dl.add_argument("version", nargs="?", default=DEFAULT_VERSION,
-                    help=f"Dataset version (default: {DEFAULT_VERSION})")
+    dl.add_argument("version", nargs="?", default=DEFAULT_VERSION, help=f"Dataset version (default: {DEFAULT_VERSION})")
     dl.add_argument("--files", nargs="+", help="Specific filenames to download")
     dl.add_argument("--small", action="store_true", help="Download the small sample bundle")
-    dl.add_argument("--no-sim", action="store_true",
-                    help="Download only the real measurements (skip the DDACS simulations)")
-    dl.add_argument("--out", default=DEFAULT_DATA_DIR,
-                    help=f"Output directory (default: {DEFAULT_DATA_DIR})")
+    dl.add_argument(
+        "--no-sim", action="store_true", help="Download only the real measurements (skip the DDACS simulations)"
+    )
+    dl.add_argument("--out", default=DEFAULT_DATA_DIR, help=f"Output directory (default: {DEFAULT_DATA_DIR})")
     dl.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt")
-    dl.add_argument("-q", "--quiet", action="store_true",
-                    help="No output or progress bars; implies --yes")
+    dl.add_argument("-q", "--quiet", action="store_true", help="No output or progress bars; implies --yes")
     dl.add_argument("--extract", action="store_true", help="Extract downloaded zips into their directory")
     dl.add_argument("--remove-zip", action="store_true", help="Delete zips after extraction (with --extract)")
 

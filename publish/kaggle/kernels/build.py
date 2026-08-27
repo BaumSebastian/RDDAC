@@ -36,14 +36,14 @@ def _slug(title: str) -> str:
 # file, title, pip target  (notebook 05 builds its own loose dir from the
 # sample zip via tempfile, so all six use the same std fetch)
 NOTEBOOKS = [
-    ("01_getting_started.ipynb", "RDDAC 01 Getting Started",             "rddac"),
-    ("02_views.ipynb",           "RDDAC 02 Build Your Own View",         "rddac"),
-    ("03_pytorch.ipynb",         "RDDAC 03 PyTorch Training",            "rddac[torch]"),
-    ("04_visualization.ipynb",   "RDDAC 04 Visualization",               "rddac"),
-    ("05_loose_h5.ipynb",        "RDDAC 05 Loose HDF5",                  "rddac"),
+    ("01_getting_started.ipynb", "RDDAC 01 Getting Started", "rddac"),
+    ("02_views.ipynb", "RDDAC 02 Build Your Own View", "rddac"),
+    ("03_pytorch.ipynb", "RDDAC 03 PyTorch Training", "rddac[torch]"),
+    ("04_visualization.ipynb", "RDDAC 04 Visualization", "rddac"),
+    ("05_loose_h5.ipynb", "RDDAC 05 Loose HDF5", "rddac"),
     # retitled: the original slug (…-numpy-export) was tombstoned by a failed create
-    ("06_streaming.ipynb",       "RDDAC 06 Streaming and Export",        "rddac"),
-    ("07_preprocessing.ipynb",   "RDDAC 07 Preprocessing",               "rddac[preprocessing]"),
+    ("06_streaming.ipynb", "RDDAC 06 Streaming and Export", "rddac"),
+    ("07_preprocessing.ipynb", "RDDAC 07 Preprocessing", "rddac[preprocessing]"),
 ]
 
 
@@ -72,8 +72,13 @@ Docs: https://rddac.readthedocs.io · Package: https://pypi.org/project/rddac ·
 
 
 def _code(src: str) -> dict:
-    return {"cell_type": "code", "metadata": {}, "execution_count": None,
-            "outputs": [], "source": src.splitlines(keepends=True)}
+    return {
+        "cell_type": "code",
+        "metadata": {},
+        "execution_count": None,
+        "outputs": [],
+        "source": src.splitlines(keepends=True),
+    }
 
 
 def _md(src: str) -> dict:
@@ -85,8 +90,7 @@ def adapt(nb: dict, pip_target: str) -> dict:
     of the unmodified repo notebook (paths mapped to /kaggle/working)."""
     for c in nb["cells"]:
         c["source"] = [
-            ln.replace("Path('../data')", f"Path('{DATA_DIR}')")
-              .replace("Path('./data')", f"Path('{DATA_DIR}')")
+            ln.replace("Path('../data')", f"Path('{DATA_DIR}')").replace("Path('./data')", f"Path('{DATA_DIR}')")
             for ln in c["source"]
             # the repo-root/notebook alternative comment is meaningless on Kaggle
             if not ln.lstrip().startswith("# DATA_DIR = ")
@@ -103,9 +107,11 @@ def adapt(nb: dict, pip_target: str) -> dict:
     )
 
     setup = [
-        _md("## Kaggle setup\n\nInstall `rddac` and fetch the ~174 MB sample — both quiet. "
+        _md(
+            "## Kaggle setup\n\nInstall `rddac` and fetch the ~174 MB sample — both quiet. "
             "Auto-generated from the repo notebook — "
-            "https://github.com/BaumSebastian/RDDAC ."),
+            "https://github.com/BaumSebastian/RDDAC ."
+        ),
         _code(f"!pip install -q {pip_target}"),
         _code(fetch),
     ]
@@ -122,15 +128,15 @@ def kernel_metadata(slug: str, title: str, code_file: str) -> dict:
         "kernel_type": "notebook",
         "is_private": False,
         "enable_gpu": False,
-        "enable_internet": True,        # needed for pip install + rddac download
-        "dataset_sources": [DATASET],   # links the kernel to the dataset's Code tab
+        "enable_internet": True,  # needed for pip install + rddac download
+        "dataset_sources": [DATASET],  # links the kernel to the dataset's Code tab
         "competition_sources": [],
         "kernel_sources": [],
     }
 
 
 def main() -> None:
-    shutil.rmtree(OUT, ignore_errors=True)   # drop stale slugs from earlier builds
+    shutil.rmtree(OUT, ignore_errors=True)  # drop stale slugs from earlier builds
     OUT.mkdir(parents=True, exist_ok=True)
     for fname, title, pip_target in NOTEBOOKS:
         slug = _slug(title)
@@ -138,8 +144,7 @@ def main() -> None:
         dest = OUT / slug
         dest.mkdir(parents=True, exist_ok=True)
         (dest / fname).write_text(json.dumps(nb, indent=1))
-        (dest / "kernel-metadata.json").write_text(
-            json.dumps(kernel_metadata(slug, title, fname), indent=2))
+        (dest / "kernel-metadata.json").write_text(json.dumps(kernel_metadata(slug, title, fname), indent=2))
         print(f"built {slug}  ->  {dest}")
 
 
