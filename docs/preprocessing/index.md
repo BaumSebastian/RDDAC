@@ -7,7 +7,7 @@ The published dataset is raw by design: checksum-pinned files carrying the measu
 ## Quickstart
 
 ```bash
-pip install 'rddac[preprocessing]'        # scipy + scikit-learn for the pointcloud stage
+pip install 'rddac[preprocessing]'        # scipy, scikit-learn, joblib for the pointcloud stage
 rddac preprocess                          # all modalities -> <data-dir>/processed
 rddac preprocess oil force --ids 0-999    # subset of modalities and experiments
 ```

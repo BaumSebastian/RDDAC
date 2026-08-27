@@ -61,9 +61,11 @@ Trained models are derived artifacts and are **not distributed**. The bundled la
 | `z_tolerance_mm` | 1.0 | radial monotonicity tolerance |
 | `min_component_size` | 50 | 3D component filter (seed stage + final sweep) |
 | `k_angle` / `k_mono` / `k_closing` | 15 / 20 / 8 | kNN sizes |
+| `max_closing_iter` | 15 | upper bound on morphological-closing iterations |
 | `icp_max_iterations` / `icp_sample_size` | 50 / 50000 | ICP effort |
 | `rf_threshold` | 0.5 | fin-classifier decision threshold (higher = more conservative removal) |
 | `rf_n_estimators` / `rf_max_depth` | 150 / 18 | RF hyperparameters (changing them retrains) |
+| `keep_prepared` | false | keep the prepared training grids after a successful retrain (debugging aid) |
 
 Alignment (ICP rotation/translation), the simulation match, per-stage removal counts, and every parameter used are stamped into the `pointcloud/{op}` attributes.
 

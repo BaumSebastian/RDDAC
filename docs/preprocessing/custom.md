@@ -55,7 +55,7 @@ def median_oil(raw: np.ndarray, kernel: int = 7) -> np.ndarray:
     grid["val"] = grid["val"].interpolate().bfill().ffill()
     return grid.to_numpy(dtype=np.float32)
 
-for exp_id in sorted(available_ids(DATA_DIR)):
+for exp_id in sorted(available_ids(DATA_DIR) or []):
     with rddac.open_h5(exp_id, data_dir=DATA_DIR) as raw:
         cleaned = median_oil(raw["oil_thickness/data"][:])
     with h5py.File(OUT_DIR / f"{exp_id:04d}.h5", "a") as out:

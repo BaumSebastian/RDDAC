@@ -23,6 +23,14 @@ pip install rddac[torch]
 
 This pulls the default PyTorch wheel from PyPI (CPU on Windows and macOS, CUDA 12.x on Linux). For a different build (CUDA, ROCm, MPS) install PyTorch first from the [PyTorch selector](https://pytorch.org/get-started/locally/), then `pip install rddac` without the extra. The package does not pin PyTorch, so an existing wheel is preserved.
 
+## Preprocessing
+
+The `pointcloud` stage of `rddac preprocess` (geometric cleaning, ICP alignment, random-forest fin classifier) needs scipy, scikit-learn and joblib; the `force`, `sheet` and `oil` stages run without them.
+
+```bash
+pip install rddac[preprocessing]
+```
+
 ## Advanced
 
 ### Documentation build
@@ -42,6 +50,6 @@ pip install -e .[dev,torch]
 pre-commit install
 ```
 
-`[dev]` adds `pytest`, `black`, `ruff`, `bumpver`, and `pre-commit`.
+`[dev]` adds `pytest`, `black`, `ruff`, `bumpver`, `pre-commit`, and the `[preprocessing]` extra so the whole test suite collects.
 
 All runtime dependencies install automatically. This includes the [`ddacs`](https://ddacs.readthedocs.io) package, which provides the shared dataset machinery and the download of the matching simulations.
