@@ -18,6 +18,8 @@ Usage:
     rddac download --extract           # Also extract zips next to the zip
     rddac download --extract --remove-zip
     rddac download --quiet             # No output/progress; implies --yes
+    rddac preprocess                   # Process all modalities into the ML-ready layout
+    rddac preprocess oil force         # Process a subset of modalities
 
 Zip files are kept by default so they remain readable in place via mlcroissant
 (the Croissant manifest references zip members directly).
@@ -36,6 +38,7 @@ from ddacs.cli import _dataset_title  # noqa: F401  — identical helper, re-exp
 from rich.panel import Panel
 
 from . import __version__
+from ._preprocess.cli import add_preprocess_parser, cmd_preprocess
 from .spec import (
     DDACS_DATASET_DOI,
     DDACS_SIM_FILE,
@@ -153,11 +156,15 @@ def main() -> None:
     dl.add_argument("--extract", action="store_true", help="Extract downloaded zips into their directory")
     dl.add_argument("--remove-zip", action="store_true", help="Delete zips after extraction (with --extract)")
 
+    add_preprocess_parser(sub)
+
     args = parser.parse_args()
     if args.command == "info":
         cmd_info(args)
     elif args.command == "download":
         cmd_download(args)
+    elif args.command == "preprocess":
+        cmd_preprocess(args)
     else:
         parser.print_help()
 

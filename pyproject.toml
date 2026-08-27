@@ -80,7 +80,7 @@ include = ["rddac*"]
 [tool.setuptools.package-data]
 # Fin labels ship with the package: the pointcloud cleaner retrains from them
 # on first use (models themselves are derived artifacts and are not shipped).
-"rddac._preprocess" = ["labels/*.npz", "*.json"]
+"rddac._preprocess" = ["labels/*.npz", "*.json", "*.csv"]
 
 [tool.black]
 line-length = 120
