@@ -1,14 +1,15 @@
 # RDDAC notebooks
 
-Six end-to-end Jupyter notebooks that companion the [online documentation](https://rddac.readthedocs.io). Each notebook is self-contained: it opens with a Walkthrough list and the Assumptions it relies on, then walks through the topic step by step. Reading top to bottom is the intended flow.
+Seven end-to-end Jupyter notebooks that companion the [online documentation](https://rddac.readthedocs.io). Each notebook is self-contained: it opens with a Walkthrough list and the Assumptions it relies on, then walks through the topic step by step. Reading top to bottom is the intended flow.
 
 RDDAC is the experimental counterpart to the [DDACS](https://ddacs.readthedocs.io) simulation dataset, and the `rddac` package mirrors the `ddacs` API 1:1 — these notebooks mirror the DDACS notebook series the same way.
 
 ## Prerequisites
 
 ```bash
-# Install the package + the PyTorch extra (needed for 03_pytorch.ipynb).
-pip install 'rddac[torch]'
+# Install the package + the PyTorch extra (needed for 03_pytorch.ipynb) and the
+# preprocessing extra (needed for 07_preprocessing.ipynb).
+pip install 'rddac[torch,preprocessing]'
 
 # Fetch the small sample bundle once. Writes metadata.json,
 # process_parameters.csv, and one sample zip with 18 experiments

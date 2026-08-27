@@ -23,7 +23,7 @@
 ## About this sample
 
 This is a **~174 MB teaser** of RDDAC — 18 experiments (one per category) plus the
-Croissant 1.1 manifest, the complete process-parameter table, and the six tutorial
+Croissant 1.1 manifest, the complete process-parameter table, and the seven tutorial
 notebooks — so you can explore the schema and run every tutorial in seconds before
 committing to the full download.
 
@@ -33,7 +33,7 @@ data/
   process_parameters.csv    parameters + splits for all 9,000 experiments
   h5/sample.zip             18 experiments, one per category (all modalities)
 rddac_documentation.pdf     dataset documentation
-notebooks/                  six end-to-end tutorials (see notebooks/README.md)
+notebooks/                  seven end-to-end tutorials (see notebooks/README.md)
 ```
 
 **Croissant manifest.** `data/metadata.json` is the
@@ -86,7 +86,7 @@ for batch in DataLoader(ds, batch_size=1, num_workers=0):
 
 ## Tutorials
 
-Six end-to-end notebooks ship in `notebooks/` and are published on
+Seven end-to-end notebooks ship in `notebooks/` and are published on
 [Read the Docs](https://rddac.readthedocs.io/en/latest/tutorials/):
 
 1. **Getting started** — install, inspect one experiment, 3D point cloud plot.
@@ -95,6 +95,7 @@ Six end-to-end notebooks ship in `notebooks/` and are published on
 4. **Visualization** — scans, point clouds, force curves, traverses.
 5. **Loose HDF5 recipe** — pandas + `h5py` after `--extract --remove-zip`.
 6. **Streaming & numpy export** — `iter_view`, `export_to_numpy`.
+7. **Preprocessing** — `rddac preprocess`, self-describing outputs, processing figures, the processed layer through the same views.
 
 ## Relationship to DDACS
 

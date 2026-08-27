@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Kaggle Notebook (kernel) versions of the six RDDAC tutorials.
+"""Generate Kaggle Notebook (kernel) versions of the seven RDDAC tutorials.
 
 The repo notebooks in notebooks/ are the single source of truth; the only
 adaptation for Kaggle is a setup cell that `pip install`s rddac and fetches the
@@ -34,7 +34,7 @@ def _slug(title: str) -> str:
 
 
 # file, title, pip target  (notebook 05 builds its own loose dir from the
-# sample zip via tempfile, so all six use the same std fetch)
+# sample zip via tempfile, so all seven use the same std fetch)
 NOTEBOOKS = [
     ("01_getting_started.ipynb", "RDDAC 01 Getting Started", "rddac"),
     ("02_views.ipynb", "RDDAC 02 Build Your Own View", "rddac"),

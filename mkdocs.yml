@@ -1,4 +1,3 @@
-# TODO: Update site_url when Read the Docs is set up
 site_name: RDDAC Documentation
 site_url: https://rddac.readthedocs.io
 site_description: Real Deep Drawing and Cutting Dataset - Python interface
