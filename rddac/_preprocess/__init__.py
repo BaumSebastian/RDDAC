@@ -5,9 +5,6 @@ these modules may change without notice. Anyone replacing a processing step
 should read raw data via the public API and match the documented processed
 schema instead of importing from here (see the "Custom processing" docs page).
 
-STATUS: ``force``, ``sheet`` and ``oil`` are implemented (ported from the
-validated internal pipeline); ``pointcloud`` follows.
-
 Design decisions (2026-08):
 
 - **Raw files are never modified.** Processing reads the raw experiments

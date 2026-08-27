@@ -27,14 +27,17 @@
 | **Train / val / test** | 7,200 / 900 / 900 (predefined, seed 42) |
 | **Matching simulations** | DDACS `rddac.zip` ({{ simulation_download_size() }}), fetched by `rddac download` |
 
-The `rddac` package ships with the dataset and provides a Croissant native interface: one CLI for the download, one Python module for access, and an optional PyTorch `IterableDataset` for training.
+The `rddac` package ships with the dataset and provides a Croissant native interface: one CLI for the download and the reference preprocessing, one Python module for access, and an optional PyTorch `IterableDataset` for training.
 
 ## Get the data
 
 ```bash
 pip install rddac               # install the package
 rddac download --small          # {{ small_download_size() }} sample bundle into ./data
+rddac preprocess oil force sheet  # optional: the ML-ready layer into ./data/processed
 ```
+
+The published files are raw by design; [Preprocessing](preprocessing/index.md) describes the optional, reproducible layer `rddac preprocess` derives from them.
 
 ## A first read
 

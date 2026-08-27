@@ -34,7 +34,7 @@
 
 Try the ~174 MB teaser (18 experiments, manifest, parameter table, runnable tutorials): **[Kaggle](https://www.kaggle.com/datasets/baumsebastian/rddac-teaser)** · **[Hugging Face](https://huggingface.co/datasets/BaumSebastian/rddac-teaser)** · **[Zenodo](https://zenodo.org/records/21274093)**
 
-The `rddac` package ships with the dataset and provides a Croissant native interface: one CLI for the download, one Python module for access, and an optional PyTorch `IterableDataset` for training.
+The `rddac` package ships with the dataset and provides a Croissant native interface: one CLI for the download and the reference preprocessing, one Python module for access, and an optional PyTorch `IterableDataset` for training.
 
 ## Installation
 
@@ -46,6 +46,12 @@ The PyTorch adapter is an optional extra. For hardware specific PyTorch builds (
 
 ```bash
 pip install 'rddac[torch]'
+```
+
+The `pointcloud` stage of `rddac preprocess` needs scipy and scikit-learn:
+
+```bash
+pip install 'rddac[preprocessing]'
 ```
 
 ## Download the dataset
@@ -60,6 +66,17 @@ rddac download
 # Real measurements only (skip the simulations).
 rddac download --no-sim
 ```
+
+## Preprocess the dataset
+
+The published files are raw by design. `rddac preprocess` derives an ML-ready layer next to them (`./data/processed`, raw files untouched): forming-window force curves, cleaned oil-film and sheet-thickness profiles, and calibrated, simulation-aligned point clouds. Every parameter is adjustable via TOML and stamped into the output; the same Croissant views stream both layers.
+
+```bash
+rddac preprocess                   # all modalities (pointcloud needs the simulations)
+rddac preprocess oil force sheet   # a subset, e.g. on the small bundle
+```
+
+See the [preprocessing documentation](https://rddac.readthedocs.io/en/latest/preprocessing/) for what each stage does and how to replace one with your own algorithm.
 
 ## Basic usage
 

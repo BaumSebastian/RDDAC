@@ -74,7 +74,7 @@ rows: 9000, columns: ['index', 'experiment_id', 'category', 'geometry', 'blankho
 
 Walk the (filtered) rows, build the zero-padded path, skip experiments whose `.h5` is missing locally, and open each one with `h5py.File`. Below: take the concave subset, then read the sheet-thickness range from every loose file that landed on disk. With the small bundle only the 9 concave sample experiments exist, so the loop yields 9 lines.
 
-One raw-data detail: the traverse tables contain occasional **sensor error values** (large negative numbers where the sensor lost contact). The published files carry the data exactly as recorded, so filter to plausible values before taking statistics — outlier cleaning belongs to the planned preprocessing step.
+One raw-data detail: the traverse tables contain occasional **sensor error values** (large negative numbers where the sensor lost contact). The published files carry the data exactly as recorded, so filter to plausible values before taking statistics — outlier cleaning is what the optional [preprocessing](../preprocessing/sheet.md) step (`rddac preprocess sheet oil`) does.
 
 ```python
 concave = params.query("geometry == 'concave'")

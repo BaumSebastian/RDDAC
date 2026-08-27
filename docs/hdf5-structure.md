@@ -105,7 +105,7 @@ Two laser scans of the part: `op10/` after deep drawing and `op20/` after cuttin
     {{ missing_pointcloud() }} experiments have no `pointcloud/` group (flagged by `has_pointcloud`). Filter with `where=lambda row: row["has_pointcloud"]` when streaming.
 
 !!! note "Raw sensor units"
-    `z` and `luminescence` are **uncalibrated sensor units**, not mm. Calibration, outlier cleaning, and alignment to the DDACS simulation frame are an optional preprocessing step planned for package v1.1; the published files carry the scans exactly as the scanner recorded them.
+    `z` and `luminescence` are **uncalibrated sensor units**, not mm. The published files carry the scans exactly as the scanner recorded them. Calibration to mm, outlier cleaning, and alignment to the DDACS simulation frame are the optional [preprocessing](preprocessing/pointcloud.md) step (`rddac preprocess pointcloud`), which writes a separate processed layer; see [Preprocessing](preprocessing/index.md) for the processed schema.
 
 ## Reading example
 

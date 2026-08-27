@@ -20,7 +20,6 @@ from .training import train_all
 
 #: Runner contract: this module owns its h5 groups (see runner dispatch).
 PROCESSES_FILE = True
-IMPLEMENTED = True
 
 _CTX: dict = {}
 

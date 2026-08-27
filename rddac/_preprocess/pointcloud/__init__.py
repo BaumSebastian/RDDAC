@@ -19,10 +19,5 @@ Pipeline per operation (OP10 deep drawing, OP20 cutting):
    cached under ``<data_dir>/models`` (models are not shipped).
 6. Final small-component sweep on the cleaned cloud.
 
-The stage flag below is flipped once the full chain is wired into the runner.
+The runner drives the stage through :mod:`.stage` (``PROCESSES_FILE`` contract).
 """
-
-from __future__ import annotations
-
-#: Checked by the runner: unimplemented modalities are skipped with a notice.
-IMPLEMENTED = False

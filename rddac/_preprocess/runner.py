@@ -174,8 +174,7 @@ def run(
     """Process the selected modalities for all selected experiments.
 
     Args:
-        names: Modalities to run, in order; unimplemented ones are skipped
-            with a notice.
+        names: Modalities to run, in order.
         data_dir: Directory holding the raw dataset (zips or loose ``.h5``).
         out_dir: Output directory for processed files (created if missing).
         ids: Optional id selection, e.g. ``'0-999'`` or ``'42,1035'``.
@@ -207,10 +206,7 @@ def run(
                 console.print(f"[yellow]{exc} — skipped[/yellow]")
                 continue
             raise
-        if getattr(module, "IMPLEMENTED", True):
-            selected.append(name)
-        else:
-            console.print(f"[yellow]{name}: not implemented yet — skipped[/yellow]")
+        selected.append(name)
     names = selected
     if not names:
         return {"elapsed_s": 0.0}

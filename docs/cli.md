@@ -35,6 +35,7 @@ rddac download [VERSION] [OPTIONS]
 | `--extract` | Extract zip files in place after download |
 | `--remove-zip` | Delete the zip file after a successful extraction (requires `--extract`) |
 | `-y, --yes` | Skip the confirmation prompt |
+| `-q, --quiet` | No output or progress; implies `--yes` |
 
 ### Default behaviour
 
@@ -85,7 +86,7 @@ rddac preprocess [MODALITY ...] [OPTIONS]
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud` (`pointcloud` is not implemented yet and is skipped with a notice) |
+| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud`. Without an explicit list, `pointcloud` is skipped with a notice when the DDACS simulations (or the `rddac[preprocessing]` extra) are missing; named explicitly, it fails with an actionable error instead. |
 
 ### Options
 
@@ -99,6 +100,7 @@ rddac preprocess [MODALITY ...] [OPTIONS]
 | `--overwrite` | Recompute modalities that already exist in the output files |
 | `--config TOML` | TOML file overriding processing parameters |
 | `--dump-config` | Print the default processing parameters as TOML and exit |
+| `--rebuild-models` | Force retraining of the cached fin-classifier models (pointcloud stage) |
 | `-y, --yes` | Skip the confirmation prompt |
 | `-q, --quiet` | No output or progress bars; implies `--yes` |
 

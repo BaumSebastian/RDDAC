@@ -88,7 +88,7 @@ The same buffers plot directly as a 3D point cloud — `rddac.scan_to_pointcloud
 *OP10 scan of experiment `0000` as a 3D point cloud. The sparse bands on the steep cup walls are pixels without a laser return — raw data, no cleaning applied.*
 
 !!! note "Raw sensor data"
-    The scan `z` and `luminescence` buffers are stored in **uncalibrated sensor units**, and the number of samples `n` in the force and traverse tables varies per experiment — this is deliberately the raw data as recorded. An optional preprocessing step (calibration to mm, outlier cleaning, and alignment to the DDACS simulation frame) is planned for package v1.1 and is not part of the current release.
+    The scan `z` and `luminescence` buffers are stored in **uncalibrated sensor units**, and the number of samples `n` in the force and traverse tables varies per experiment — this is deliberately the raw data as recorded. The optional [preprocessing](preprocessing/index.md) step (`rddac preprocess`) derives calibrated, cleaned, fixed-shape data into a separate processed layer; the published files stay raw.
 
 ## Missing measurements
 

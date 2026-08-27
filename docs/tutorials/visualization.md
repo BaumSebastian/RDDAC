@@ -22,7 +22,7 @@ The raw laser scans are flat `(6400000,)` buffers stored row-major over a 2000 x
 - `mask_zero=True`: the scanner writes `0` where it measured nothing; masking renders those pixels transparent so the part silhouette stands out.
 - The grid dimensions default to the group attrs (`x_shape=3200`, `y_shape=2000`); pass them explicitly if you sliced the buffer yourself.
 
-Values are raw sensor units — the mm calibration belongs to the planned preprocessing step (package v1.1).
+Values are raw sensor units; the mm calibration belongs to the optional [preprocessing](../preprocessing/pointcloud.md) step (`rddac preprocess pointcloud`).
 
 ```python
 with rddac.open_h5(experiment_id, data_dir=DATA_DIR) as f:
