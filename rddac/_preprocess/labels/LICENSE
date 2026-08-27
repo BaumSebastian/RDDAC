@@ -1,0 +1,7 @@
+The label files in this directory (*.npz) are annotations of the RDDAC
+dataset (doi:10.18419/DARUS-5589) and are licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/), like the dataset they
+annotate. When using them, attribute the RDDAC dataset.
+
+The source code of this repository remains MIT-licensed; see the LICENSE
+file in the repository root.
