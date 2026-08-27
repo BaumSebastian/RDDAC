@@ -1,7 +1,19 @@
-/* RDDAC brand color: dark purple #470047 (used with palette `primary: custom`). */
-:root {
-  --md-primary-fg-color:        #470047;
-  --md-primary-fg-color--light: #7a2e7a;
-  --md-primary-fg-color--dark:  #2e002e;
-  --md-accent-fg-color:         #8a3d8a;
+/* RDDAC brand color: violet #7F00FF (used with palette `primary: custom` / `accent: custom`). */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #7F00FF;
+  --md-primary-fg-color--light: #A64DFF;
+  --md-primary-fg-color--dark:  #5A00B5;
+  --md-accent-fg-color:         #7F00FF;
+  --md-typeset-a-color:         #7F00FF;
+}
+
+/* Dark mode: same hue, softer. A desaturated lavender for links and accents,
+   a deeper violet for the header so it does not glow on slate. */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:        #6A00D6;
+  --md-primary-fg-color--light: #A78BFA;
+  --md-primary-fg-color--dark:  #4B0099;
+  --md-accent-fg-color:         #A78BFA;
+  --md-typeset-a-color:         #A78BFA;
 }
