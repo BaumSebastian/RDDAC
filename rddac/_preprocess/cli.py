@@ -11,14 +11,18 @@ import argparse
 import os
 
 from ddacs import cli as _ddacs_cli
+from rich.console import Console
 from rich.markup import escape
 from rich.panel import Panel
+from rich.prompt import Confirm
 
 from ..spec import RDDAC_SPEC
 from . import config as config_mod
 from .runner import MODALITIES, PROCESSED_MARKER, run
 
 console = _ddacs_cli.console  # shared console: ddacs's --quiet handling applies
+#: Errors go to stderr so they stay visible when --quiet silences the main console.
+err_console = Console(stderr=True)
 
 
 def add_preprocess_parser(sub: argparse._SubParsersAction) -> None:
@@ -88,20 +92,26 @@ def cmd_preprocess(args: argparse.Namespace) -> None:
         print(config_mod.dump())  # plain print: pipeable into a file
         return
 
+    # --quiet silences all decorative output and progress bars and implies
+    # --yes so the run proceeds unattended (errors still go to stderr).
+    if args.quiet:
+        args.yes = True
+    console.quiet = args.quiet
+
     try:
         cfg = config_mod.load(args.config) if args.config else {}
     except (OSError, ValueError) as exc:
-        console.print(f"[red]--config: {escape(str(exc))}[/red]")
+        err_console.print(f"[red]--config: {escape(str(exc))}[/red]")
         raise SystemExit(2)
 
     names = list(args.modalities) or list(MODALITIES)
     unknown = [n for n in names if n not in MODALITIES]
     if unknown:
-        console.print(f"[red]Unknown modality: {', '.join(unknown)}[/red] " f"(valid: {', '.join(MODALITIES)})")
+        err_console.print(f"[red]Unknown modality: {', '.join(unknown)}[/red] " f"(valid: {', '.join(MODALITIES)})")
         raise SystemExit(2)
 
     out_dir = args.out or os.path.join(args.data_dir, "processed")
-    _guard_out_dir(args.data_dir, out_dir, console)
+    _guard_out_dir(args.data_dir, out_dir, err_console)
     selection = args.ids or args.split or "all"
     if not args.quiet:
         console.print(
@@ -115,6 +125,9 @@ def cmd_preprocess(args: argparse.Namespace) -> None:
                 border_style="cyan",
             )
         )
+    if not args.yes and not Confirm.ask("Proceed?", default=False, console=console):
+        console.print("Aborted.")
+        return
 
     try:
         run(
@@ -132,5 +145,5 @@ def cmd_preprocess(args: argparse.Namespace) -> None:
             rebuild_models=args.rebuild_models,
         )
     except FileNotFoundError as exc:  # explicit stage with missing prerequisites (e.g. simulations)
-        console.print(f"[red]{escape(str(exc))}[/red]")
+        err_console.print(f"[red]{escape(str(exc))}[/red]")
         raise SystemExit(2)

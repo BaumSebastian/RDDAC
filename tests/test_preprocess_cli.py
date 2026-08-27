@@ -5,6 +5,7 @@ import argparse
 import pytest
 from rich.console import Console
 
+from rddac._preprocess import cli as pcli
 from rddac._preprocess.cli import _guard_out_dir, add_preprocess_parser
 
 
@@ -42,3 +43,51 @@ class TestOutputDirGuard:
 
     def test_accepts_fresh_subdirectory(self, tmp_path):
         _guard_out_dir(str(tmp_path), str(tmp_path / "processed"), Console(quiet=True))
+
+
+class TestCmdPreprocess:
+    """Dispatch, prompt and error paths of ``cmd_preprocess`` (the runner is stubbed)."""
+
+    @pytest.fixture(autouse=True)
+    def _stub_run(self, monkeypatch, tmp_path):
+        self.calls = []
+        monkeypatch.setattr(pcli, "run", lambda names, **kw: self.calls.append((names, kw)) or {})
+        self.data = tmp_path / "data"
+        self.data.mkdir()
+        (self.data / "0000.h5").write_bytes(b"")
+        monkeypatch.setattr(pcli.console, "quiet", False)
+
+    def test_dump_config_prints_toml_and_exits(self, capsys):
+        pcli.cmd_preprocess(_parse(["--dump-config"]))
+        assert "[oil]" in capsys.readouterr().out and not self.calls
+
+    def test_bad_config_and_unknown_modality_exit_2(self, tmp_path):
+        bad = tmp_path / "bad.toml"
+        bad.write_text("[nope]\nx = 1\n")
+        with pytest.raises(SystemExit) as exc:
+            pcli.cmd_preprocess(_parse(["--data-dir", str(self.data), "--config", str(bad), "-y"]))
+        assert exc.value.code == 2
+        with pytest.raises(SystemExit) as exc:
+            pcli.cmd_preprocess(_parse(["lidar", "--data-dir", str(self.data), "-y"]))
+        assert exc.value.code == 2 and not self.calls
+
+    def test_prompt_declined_aborts(self, monkeypatch):
+        monkeypatch.setattr(pcli.Confirm, "ask", lambda *a, **k: False)
+        pcli.cmd_preprocess(_parse(["oil", "--data-dir", str(self.data)]))
+        assert not self.calls
+
+    def test_yes_and_quiet_skip_prompt(self, monkeypatch):
+        monkeypatch.setattr(pcli.Confirm, "ask", lambda *a, **k: pytest.fail("prompt must be skipped"))
+        pcli.cmd_preprocess(_parse(["oil", "--data-dir", str(self.data), "-y"]))
+        pcli.cmd_preprocess(_parse(["oil", "force", "--data-dir", str(self.data), "-q"]))
+        assert [c[0] for c in self.calls] == [["oil"], ["oil", "force"]]
+        assert self.calls[1][1]["quiet"] is True and pcli.console.quiet is True
+        pcli.console.quiet = False
+
+    def test_registered_in_main_cli(self):
+        import rddac.cli as main_cli
+
+        parser = main_cli.argparse.ArgumentParser()
+        sub = parser.add_subparsers(dest="command")
+        main_cli.add_preprocess_parser(sub)
+        assert parser.parse_args(["preprocess", "sheet", "-q"]).command == "preprocess"
