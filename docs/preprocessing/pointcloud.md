@@ -13,13 +13,18 @@ The `pointcloud` stage turns the raw laser-scan grids (`pointcloud/{op10,op20}/z
 
 ## Why this stage exists
 
-Raw scans carry measurement artifacts — most prominently **fins**: locally smooth, wing-like surfaces at draw-in and cut edges that are not part of the physical part. They survive naive filters precisely because they are locally smooth; detecting them reliably needs cross-sample context. The scans are also uncalibrated and each sits in its own scanner frame, so cross-experiment or sim-to-real comparisons need calibration and registration first.
+Raw scans carry measurement artifacts, most prominently **fins**: locally smooth, wing-like surfaces at draw-in and cut edges that are not part of the physical part. They survive naive filters precisely because they are locally smooth; detecting them reliably needs cross-sample context. The scans are also uncalibrated and each sits in its own scanner frame, so cross-experiment or sim-to-real comparisons need calibration and registration first.
 
 ## Processing steps
 
-1. **Validity mask** — connected-component filtering of the luminescence grid plus `z > 0`.
-2. **Calibration** — x from the sensor specification, z from the calibration-block measurement (both packaged in `calibration.json`), y per scan from the square-part assumption.
-3. **Geometric outlier seeds** — three complementary detectors, then morphological closing on a kNN graph:
+1. **Validity mask**: connected-component filtering of the luminescence grid plus `z > 0`.
+
+    <img src="../../images/preprocessing/luminescence_processing_op10.png" width="900">
+
+    *Luminescence of one OP10 scan: raw grid (a), connected foreground patches (b), the validity mask after the patch-size filter (c), and the packed `uint8` image written to the processed file (d).*
+
+2. **Calibration**: x from the sensor specification, z from the calibration-block measurement (both packaged in `calibration.json`), y per scan from the square-part assumption.
+3. **Geometric outlier seeds**: three complementary detectors, then morphological closing on a kNN graph:
     - *surface angle*: local SVD plane fits; a point is seeded when its normal deviates more than the cutoff from vertical,
 
         $$ \theta = \arccos\left(|n_z|\right) > \theta_{\max}, \qquad \theta_{\max} = 70^\circ \text{ (concave)}, \; 80^\circ \text{ (convex)} $$
@@ -28,13 +33,17 @@ Raw scans carry measurement artifacts — most prominently **fins**: locally smo
 
     - *radial monotonicity*: on a formed cup, z must not increase moving outward from the part center;
     - *small 3D components*: floating clusters below the minimum size.
-4. **Simulation matching + ICP** — the matching simulation is selected by geometry and blankholder force (hard) plus sheet thickness and oil-derived friction coefficient (soft, nearest); the scan is rigidly aligned to it (seeded, reproducible ICP).
-5. **RF fin classifier** — a random forest over local surface features plus three cross-sample features in a registered common frame: a position prior $P(\text{outlier}\mid\text{position})$, the slope-normalized deviation from the consensus surface, and the registered coordinates. Removal uses `predict_proba` against a configurable threshold — the precision/recall knob.
-6. **Final sweep** — small 3D components orphaned by the removal are dropped.
+4. **Simulation matching + ICP**: the matching simulation is selected by geometry and blankholder force (hard) plus sheet thickness and oil-derived friction coefficient (soft, nearest); the scan is rigidly aligned to it (seeded, reproducible ICP).
+5. **RF fin classifier**: a random forest over local surface features plus three cross-sample features in a registered common frame: a position prior $P(\text{outlier}\mid\text{position})$, the slope-normalized deviation from the consensus surface, and the registered coordinates. Removal uses `predict_proba` against a configurable threshold, the precision/recall knob.
+6. **Final sweep**: small 3D components orphaned by the removal are dropped.
+
+<img src="../../images/preprocessing/pointcloud_processing_op10.png" width="700">
+
+*One OP10 scan in top view, coloured by height: the raw calibrated scan after the validity mask (left) and the processed, ICP-aligned point cloud (right); the gaps are the removed fins and outliers.*
 
 ## The classifier is retrained on your machine
 
-Trained models are derived artifacts and are **not distributed**. On first use the stage retrains them deterministically (seed 42) from the labels bundled with the package — human-labeled outlier masks for 140 (experiment, operation) tasks — and caches them under `<data_dir>/models/pointcloud_fin_rf/` stamped with the scikit-learn version and the label fingerprint. The one-time cost is roughly 30–90 minutes; `--rebuild-models` forces a retrain. Held-out 5-fold cross-validation of the resulting cleaner:
+Trained models are derived artifacts and are **not distributed**. On first use the stage retrains them deterministically (seed 42) from the labels bundled with the package: human-labeled outlier masks for 140 (experiment, operation) tasks, and caches them under `<data_dir>/models/pointcloud_fin_rf/` stamped with the scikit-learn version and the label fingerprint. The one-time cost is roughly 30–90 minutes; `--rebuild-models` forces a retrain. Held-out 5-fold cross-validation of the resulting cleaner:
 
 | Group | Precision | Recall |
 | --- | --- | --- |
@@ -60,6 +69,6 @@ Alignment (ICP rotation/translation), the simulation match, per-stage removal co
 
 ## Further reading
 
-- [Preprocessing overview](index.md) — quickstart, output rules, reproducibility model
-- [Custom processing](custom.md) — replace this stage with your own algorithm
-- [HDF5 structure](../hdf5-structure.md) — the raw `pointcloud` groups
+- [Preprocessing overview](index.md): quickstart, output rules, reproducibility model
+- [Custom processing](custom.md): replace this stage with your own algorithm
+- [HDF5 structure](../hdf5-structure.md): the raw `pointcloud` groups

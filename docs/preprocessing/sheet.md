@@ -12,16 +12,16 @@ The `sheet` stage stabilizes the raw thickness traverse (`sheet_thickness/data`)
 
 ## Why this stage exists
 
-The traverse starts at the workpiece edge, so the first few readings are initialization artifacts, and wherever the sensor loses contact it reports **large negative error codes** instead of a thickness. Those must not leak into statistics — the mean sheet thickness of an experiment feeds the simulation matching of the [pointcloud stage](pointcloud.md).
+The traverse starts at the workpiece edge, so the first few readings are initialization artifacts, and wherever the sensor loses contact it reports **large negative error codes** instead of a thickness. Those must not leak into statistics: the mean sheet thickness of an experiment feeds the simulation matching of the [pointcloud stage](pointcloud.md).
 
 ## Processing steps
 
-1. **Tail selection** — only the last 200 readings are kept; the discarded head is the unstable initialization region.
-2. **Position normalization** — positions are shifted to start at 0, giving all experiments the same spatial reference.
-3. **Error-code masking** — negative readings become `NaN`. They are masked, **not interpolated**: how to treat missing thickness is a modeling decision that belongs to the consumer, not to preprocessing.
-4. **Quantization** — thickness to 0.01 µm, position to 0.01 mm (sensor datasheet resolutions).
+1. **Tail selection**: only the last 200 readings are kept; the discarded head is the unstable initialization region.
+2. **Position normalization**: positions are shifted to start at 0, giving all experiments the same spatial reference.
+3. **Error-code masking**: negative readings become `NaN`. They are masked, **not interpolated**: how to treat missing thickness is a modeling decision that belongs to the consumer, not to preprocessing.
+4. **Quantization**: thickness to 0.01 µm, position to 0.01 mm (sensor datasheet resolutions).
 
-<img src="../../images/preprocessing/sheet_processing.svg" width="700">
+<img src="../../images/preprocessing/sheet_processing.png" width="700">
 
 *Raw thickness traverses with the tail-selection cutoff (left) and the processed, position-normalized profiles (right).*
 
@@ -35,6 +35,6 @@ The count of masked error codes (`n_negative_masked`) and the parameters used ar
 
 ## Further reading
 
-- [Preprocessing overview](index.md) — quickstart, output rules, reproducibility model
-- [Custom processing](custom.md) — replace this stage with your own algorithm
-- [HDF5 structure](../hdf5-structure.md) — the raw `sheet_thickness` group
+- [Preprocessing overview](index.md): quickstart, output rules, reproducibility model
+- [Custom processing](custom.md): replace this stage with your own algorithm
+- [HDF5 structure](../hdf5-structure.md): the raw `sheet_thickness` group
