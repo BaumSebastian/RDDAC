@@ -1,0 +1,56 @@
+{
+  "calibration": {
+    "x_mm_per_pixel": 0.07692307692307693,
+    "z_mm_per_unit": 0.007754506005746317
+  },
+  "method": "median_width_ransac_corners",
+  "calibration_notes": {
+    "x": "Median width measurement across all rows",
+    "y": "Calculated on the fly from object dimensions (object is square)",
+    "z": "Mean of 4 corner height differences (RANSAC surfaces)"
+  },
+  "block_physical_mm": {
+    "width": 9.0,
+    "height": 1.0
+  },
+  "block_measured": {
+    "width_median_px": 117.0,
+    "width_mean_px": 116.62987012987013,
+    "width_std_px": 1.4093901172543635,
+    "z_diff_mean_raw_units": 128.95727971052838,
+    "rotation_deg": 0.934444029324082
+  },
+  "block_corners": {
+    "bottom_left": {
+      "x": 1579.0,
+      "y": 863.0,
+      "z_base": 36531.62333425112,
+      "z_block": 36661.70689660082,
+      "z_diff": 130.08356234970415
+    },
+    "bottom_right": {
+      "x": 1695.0,
+      "y": 863.0,
+      "z_base": 36533.15718455209,
+      "z_block": 36663.45121052959,
+      "z_diff": 130.29402597749868
+    },
+    "top_left": {
+      "x": 1579.0,
+      "y": 1013.0,
+      "z_base": 36534.903375016416,
+      "z_block": 36662.6189084128,
+      "z_diff": 127.71553339638194
+    },
+    "top_right": {
+      "x": 1695.0,
+      "y": 1013.0,
+      "z_base": 36536.627225223034,
+      "z_block": 36664.36322234156,
+      "z_diff": 127.73599711852876
+    }
+  },
+  "parameters": {
+    "block_threshold": 36600.0
+  }
+}
