@@ -132,7 +132,9 @@ def _group_of(name: str, geometry_by_id: dict[int, str]) -> str:
     return f"{geometry_by_id[exp_id]}_{op}"
 
 
-def train_all(data_dir: str | Path, cfg: dict, console=None, rebuild: bool = False) -> dict[str, dict]:
+def train_all(
+    data_dir: str | Path, cfg: dict, console=None, rebuild: bool = False, *, cache_root: str | Path
+) -> dict[str, dict]:
     """Train-or-load all group bundles; returns mapping group -> bundle.
 
     Args:
@@ -140,6 +142,8 @@ def train_all(data_dir: str | Path, cfg: dict, console=None, rebuild: bool = Fal
         cfg: The ``[pointcloud]`` parameter table.
         console: Optional rich console for progress messages.
         rebuild: Force retraining even when the cache fingerprint matches.
+        cache_root: Directory holding the model cache (the processed output
+            directory; the raw data directory is never written to).
 
     Returns:
         Mapping group name to trained bundle (see :mod:`.classifier`).
@@ -149,7 +153,7 @@ def train_all(data_dir: str | Path, cfg: dict, console=None, rebuild: bool = Fal
         cfg.get("rf_n_estimators", d.PC_RF_N_ESTIMATORS), cfg.get("rf_max_depth", d.PC_RF_MAX_DEPTH)
     )
     if not rebuild:
-        bundles = classifier.load_bundles(data_dir, fp)
+        bundles = classifier.load_bundles(cache_root, fp)
         if bundles is not None:
             log(f"[dim]fin classifier: loaded {len(bundles)} cached models[/dim]")
             return bundles
@@ -158,7 +162,7 @@ def train_all(data_dir: str | Path, cfg: dict, console=None, rebuild: bool = Fal
     sim_ctx = SimContext(data_dir)
     table = _experiment_table(data_dir)
     geometry_by_id = {int(i): str(g) for i, g in table["geometry"].items()}
-    prepared_dir = classifier.cache_dir(data_dir) / "prepared"
+    prepared_dir = classifier.cache_dir(cache_root) / "prepared"
 
     tasks = labeled_tasks()
     usable: dict[str, list[str]] = {g: [] for g in GROUPS}
@@ -182,7 +186,7 @@ def train_all(data_dir: str | Path, cfg: dict, console=None, rebuild: bool = Fal
         bundles[group] = _train_group(group, members, prepared_dir, cfg)
         labels_used[group] = members
 
-    classifier.save_bundles(data_dir, bundles, {"labels_used": labels_used}, fp)
+    classifier.save_bundles(cache_root, bundles, {"labels_used": labels_used}, fp)
     if not cfg.get("keep_prepared", d.PC_KEEP_PREPARED):
         for path in prepared_dir.glob("*.npz"):
             os.remove(path)

@@ -146,7 +146,8 @@ class TestStageEndToEnd:
                 assert attrs["n_geometric_outliers"] + attrs["n_rf_removed"] > 0
 
         # model cache written and reused on a second run
-        assert (classifier.cache_dir(raw) / "meta.json").is_file()
+        assert (classifier.cache_dir(out) / "meta.json").is_file()
+        assert not (raw / "models").exists(), "the raw directory is never written to"
         stats2 = run(["pointcloud"], data_dir=str(raw), out_dir=str(out), quiet=True, config=cfg)
         assert stats2["pointcloud"] == {"exists": 3}
 

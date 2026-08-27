@@ -219,7 +219,9 @@ def run(
         module = modality_module(name)
         if hasattr(module, "preflight"):
             try:
-                module.preflight(data_dir, config.get(name, {}), console=console, rebuild_models=rebuild_models)
+                module.preflight(
+                    data_dir, config.get(name, {}), console=console, rebuild_models=rebuild_models, out_dir=out_dir
+                )
             except FileNotFoundError as exc:
                 if not skip_unavailable:
                     raise

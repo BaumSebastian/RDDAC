@@ -2,7 +2,8 @@
 
 Trained models are derived artifacts and are NOT shipped: they are retrained
 deterministically from the bundled labels on first use and cached under
-``<data_dir>/models/pointcloud_fin_rf/``. A cached bundle is only reused when
+``<out_dir>/models/pointcloud_fin_rf/`` (the processed output directory;
+the raw data directory is never written to). A cached bundle is only reused when
 its fingerprint matches: schema version, scikit-learn major.minor, the sha256
 of the bundled labels, the RF hyperparameters, and the sim-distance method.
 The decision threshold is applied at predict time and is deliberately NOT
@@ -44,9 +45,9 @@ def _sklearn_tag() -> str:
     return ".".join(sklearn.__version__.split(".")[:2])
 
 
-def cache_dir(data_dir: str | Path) -> Path:
-    """The model cache directory for a data directory."""
-    return Path(data_dir) / CACHE_SUBDIR
+def cache_dir(cache_root: str | Path) -> Path:
+    """The model cache directory under ``cache_root`` (the processed output directory)."""
+    return Path(cache_root) / CACHE_SUBDIR
 
 
 def fingerprint(rf_n_estimators: int = d.PC_RF_N_ESTIMATORS, rf_max_depth: int = d.PC_RF_MAX_DEPTH) -> dict:
@@ -61,7 +62,7 @@ def fingerprint(rf_n_estimators: int = d.PC_RF_N_ESTIMATORS, rf_max_depth: int =
     }
 
 
-def load_bundles(data_dir: str | Path, expected_fingerprint: dict) -> dict[str, dict] | None:
+def load_bundles(cache_root: str | Path, expected_fingerprint: dict) -> dict[str, dict] | None:
     """Load all cached group bundles, or None when the cache is missing/stale.
 
     Args:
@@ -72,7 +73,7 @@ def load_bundles(data_dir: str | Path, expected_fingerprint: dict) -> dict[str, 
         Mapping group -> bundle (``model``, ``feature_names``, ``prior_reg``,
         ``expected_reg``, ``ref_ds``) — or None if a retrain is needed.
     """
-    root = cache_dir(data_dir)
+    root = cache_dir(cache_root)
     meta_path = root / "meta.json"
     if not meta_path.is_file():
         return None
@@ -88,9 +89,9 @@ def load_bundles(data_dir: str | Path, expected_fingerprint: dict) -> dict[str, 
     return bundles or None
 
 
-def save_bundles(data_dir: str | Path, bundles: dict[str, dict], meta_extra: dict, fp: dict) -> None:
+def save_bundles(cache_root: str | Path, bundles: dict[str, dict], meta_extra: dict, fp: dict) -> None:
     """Persist trained bundles plus the fingerprint metadata."""
-    root = cache_dir(data_dir)
+    root = cache_dir(cache_root)
     root.mkdir(parents=True, exist_ok=True)
     for group, bundle in bundles.items():
         joblib.dump(bundle, root / f"{group}.joblib")

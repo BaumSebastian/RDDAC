@@ -28,7 +28,7 @@ Design decisions (2026-08):
 - The ``pointcloud`` stage needs the DDACS simulations (``rddac download``
   without ``--no-sim``). Its fin classifier is retrained deterministically
   from the bundled labels on first use and cached under
-  ``<data_dir>/models`` — trained models are not shipped.
+  ``<out_dir>/models`` (never in the raw directory) — trained models are not shipped.
 
 The modality registry lives in :mod:`.runner` (the modules are imported
 there, keeping this package free of import-time side effects).

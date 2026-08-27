@@ -16,7 +16,7 @@ Pipeline per operation (OP10 deep drawing, OP20 cutting):
    simulations from ``rddac download`` (without ``--no-sim``).
 5. RF fin cleaner: registered position-prior + consensus-deviation features;
    retrained deterministically from the bundled labels on first use and
-   cached under ``<data_dir>/models`` (models are not shipped).
+   cached under ``<out_dir>/models`` (models are not shipped).
 6. Final small-component sweep on the cleaned cloud.
 
 The runner drives the stage through :mod:`.stage` (``PROCESSES_FILE`` contract).

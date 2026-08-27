@@ -24,7 +24,9 @@ PROCESSES_FILE = True
 _CTX: dict = {}
 
 
-def preflight(data_dir: str | Path, config: dict, console=None, rebuild_models: bool = False) -> None:
+def preflight(
+    data_dir: str | Path, config: dict, console=None, rebuild_models: bool = False, *, out_dir: str | Path
+) -> None:
     """Fail fast on missing simulations; train-or-load the fin classifier once.
 
     Args:
@@ -32,6 +34,8 @@ def preflight(data_dir: str | Path, config: dict, console=None, rebuild_models: 
         config: The ``[pointcloud]`` parameter table.
         console: Optional rich console.
         rebuild_models: Force retraining even with a valid cache.
+        out_dir: Processed output directory; holds the model cache under
+            ``models/pointcloud_fin_rf`` (the raw directory is never written to).
     """
     sim_ctx = SimContext(data_dir)
     if not sim_ctx.available():
@@ -39,17 +43,17 @@ def preflight(data_dir: str | Path, config: dict, console=None, rebuild_models: 
             f"simulations not found under {sim_ctx.sim_dir} — the pointcloud stage aligns each scan "
             "to its matching DDACS simulation; run `rddac download` (without --no-sim) first"
         )
-    train_all(data_dir, config, console=console, rebuild=rebuild_models)
+    train_all(data_dir, config, console=console, rebuild=rebuild_models, cache_root=out_dir)
 
 
-def _context(data_dir: str | Path, config: dict) -> dict:
+def _context(data_dir: str | Path, config: dict, cache_root: str | Path) -> dict:
     """Per-process lazy context: sim access, model bundles, calibration."""
-    key = str(data_dir)
+    key = (str(data_dir), str(cache_root))
     if _CTX.get("key") != key:
         fp = classifier.fingerprint(
             config.get("rf_n_estimators", d.PC_RF_N_ESTIMATORS), config.get("rf_max_depth", d.PC_RF_MAX_DEPTH)
         )
-        bundles = classifier.load_bundles(data_dir, fp)
+        bundles = classifier.load_bundles(cache_root, fp)
         if bundles is None:
             raise RuntimeError("fin classifier cache missing/stale — preflight should have trained it")
         _CTX.update(key=key, sim=SimContext(data_dir), bundles=bundles, calib=geometry.load_calibration())
@@ -62,7 +66,8 @@ def process_experiment(raw, out, *, data_dir: str | Path, overwrite: bool, **par
     Args:
         raw: Open raw experiment (read-only h5).
         out: Open output h5 (append mode).
-        data_dir: The RDDAC data directory (simulations + model cache).
+        data_dir: The RDDAC data directory (simulations). The model cache is
+            read from the directory of ``out``.
         overwrite: Recompute even when the output group exists.
         **params: The ``[pointcloud]`` parameter table.
 
@@ -73,7 +78,7 @@ def process_experiment(raw, out, *, data_dir: str | Path, overwrite: bool, **par
         return "no_group"
     if "pointcloud" in out and not overwrite:
         return "exists"
-    ctx = _context(data_dir, params)
+    ctx = _context(data_dir, params, Path(out.filename).parent)
 
     part_geometry = str(raw.attrs["geometry"])
     blankholder_kn = int(raw.attrs["blankholder_force"])
