@@ -43,7 +43,7 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 
 ## The classifier is retrained on your machine
 
-Trained models are derived artifacts and are **not distributed**. On first use the stage retrains them deterministically (seed 42) from the labels bundled with the package: human-labeled outlier masks for 140 (experiment, operation) tasks, and caches them under `<data_dir>/models/pointcloud_fin_rf/` stamped with the scikit-learn version and the label fingerprint. The one-time cost is roughly 30–90 minutes; `--rebuild-models` forces a retrain. Held-out 5-fold cross-validation of the resulting cleaner:
+Trained models are derived artifacts and are **not distributed**. The bundled labels are annotations of the dataset and, unlike the code, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); attribute the RDDAC dataset when you reuse them. On first use the stage retrains them deterministically (seed 42) from the labels bundled with the package: human-labeled outlier masks for 140 (experiment, operation) tasks, and caches them under `<data_dir>/models/pointcloud_fin_rf/` stamped with the scikit-learn version and the label fingerprint. The one-time cost is roughly 30–90 minutes; `--rebuild-models` forces a retrain. Held-out 5-fold cross-validation of the resulting cleaner:
 
 | Group | Precision | Recall |
 | --- | --- | --- |

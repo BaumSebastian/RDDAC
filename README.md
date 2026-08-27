@@ -110,3 +110,5 @@ See the [documentation](https://rddac.readthedocs.io) for the dataset reference 
 ## License
 
 The dataset on DaRUS is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The `rddac` software is licensed under the MIT License — see [LICENSE](LICENSE).
+
+Data files bundled with the package are **not** MIT: the fin labels (`rddac/_preprocess/labels/`, human annotations of the dataset), the scanner calibration (`calibration.json`) and the simulation parameter table (`sim_params.csv`) are data derived from RDDAC/DDACS and are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) like the dataset (see `rddac/_preprocess/labels/LICENSE`).
