@@ -102,7 +102,7 @@ If a parameter is not enough, for example you want a different filter altogether
 
 ## 6. The pointcloud stage
 
-With the full release and simulations present, the same command cleans and aligns the scans (`z` → `(N, 3) float32`, `luminescence` → `(2000, 3200) uint8`); on first use it retrains the fin classifier from the bundled labels (one-time, ~30–90 min):
+With the full release and simulations present, the same command cleans and aligns the scans (`z` → `(N, 3) float32`, `luminescence` → `(2000, 3200) uint8`); on first use it retrains the random-forest fin classifier from the bundled labels (one-time, ~30–90 min):
 
 ```bash
 rddac preprocess pointcloud --workers 8

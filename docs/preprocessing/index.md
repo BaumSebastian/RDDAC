@@ -19,7 +19,7 @@ rddac preprocess oil force --ids 0-999    # subset of modalities and experiments
 | [`force`](force.md) | ~(1140, 8) → `(600, 8) float32` | forming-window trim, rest-offset removal, quantization, all 8 columns kept |
 | [`sheet`](sheet.md) | ~(208, 2) → `(200, 2) float32` | tail selection, position normalization, error codes → `NaN` |
 | [`oil`](oil.md) | ~(420, 2) → `(200, 2) float32` | dropout removal, NaN-robust Hampel filter, grid interpolation |
-| [`pointcloud`](pointcloud.md) | scan grids → `z (N, 3) float32` + `luminescence (2000, 3200) uint8` | calibration, geometric outlier stages, ICP alignment to the matched DDACS simulation, RF fin cleaner |
+| [`pointcloud`](pointcloud.md) | scan grids → `z (N, 3) float32` + `luminescence (2000, 3200) uint8` | calibration, geometric outlier stages, ICP alignment to the matched DDACS simulation, random-forest fin cleaner |
 
 Every processed group is **self-describing**: the parameter values used and the per-file cleaning statistics are stamped into its HDF5 attributes, so a file separated from the code that made it still documents itself.
 
