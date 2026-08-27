@@ -73,6 +73,56 @@ rddac download --extract --remove-zip
 
 After `--extract --remove-zip`, the HDF5 files are no longer wrapped in zips and `mlcroissant` cannot resolve the FileSet. See the [Loose HDF5 recipe](tutorials/loose-h5.md) for the appropriate iteration pattern in that case.
 
+## `rddac preprocess`
+
+Process raw measurements into the ML-ready processed layout — see [Preprocessing](preprocessing/index.md) for what each modality does. Raw files are never modified; processed files are written separately.
+
+```bash
+rddac preprocess [MODALITY ...] [OPTIONS]
+```
+
+### Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud` (`pointcloud` is not implemented yet and is skipped with a notice) |
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--data-dir PATH` | Directory holding the raw dataset — zips or loose `.h5` (default: `./data`) |
+| `--out PATH` | Output directory for processed files (default: `<data-dir>/processed`) |
+| `--ids IDS` | Experiment selection, e.g. `0-999` or `42,1035` |
+| `--split {train,val,test}` | Restrict to one of the predefined splits |
+| `--workers N` | Parallel workers (default: 1) |
+| `--overwrite` | Recompute modalities that already exist in the output files |
+| `--config TOML` | TOML file overriding processing parameters |
+| `--dump-config` | Print the default processing parameters as TOML and exit |
+| `-y, --yes` | Skip the confirmation prompt |
+| `-q, --quiet` | No output or progress bars; implies `--yes` |
+
+### Default behaviour
+
+Output lands in `<data-dir>/processed` as loose `<id>.h5` files. Re-runs append: modalities that already exist in an output file are skipped unless `--overwrite` is passed. The command refuses an output directory that looks like a raw dataset directory (see [output directory rules](preprocessing/index.md#output-directory-rules)).
+
+### Examples
+
+```bash
+# Everything, reference recipe
+rddac preprocess
+
+# Only the traverse measurements, 8 workers
+rddac preprocess sheet oil --workers 8
+
+# A parameter variant, published next to your code
+rddac preprocess --dump-config > my.toml
+rddac preprocess oil --config my.toml
+
+# One split, custom locations
+rddac preprocess --split train --data-dir /mnt/rddac --out /mnt/rddac-processed
+```
+
 ## Global Options
 
 | Option | Description |

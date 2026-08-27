@@ -8,6 +8,7 @@ These tutorials walk through the typical workflows on top of the `rddac` Python 
 4. [Visualization](visualization.md): Scan images, point clouds, force curves, and sensor traverses on top of `rddac.open_h5`.
 5. [Loose HDF5 recipe](loose-h5.md): Iterate over loose `.h5` files after `rddac download --extract --remove-zip`.
 6. [Streaming and numpy export](streaming.md): Iterate any view with `rddac.streaming.iter_view` (no PyTorch, no mlcroissant FileSet walk), and materialise it as flat `.npy` shards with `streaming.export_to_numpy` for fast training reads.
+7. [Preprocessing](preprocessing.md): Run the reference preprocessing via the CLI, inspect the self-describing outputs, adjust parameters reproducibly via TOML, and preview the pointcloud stage.
 
 If you already know the DDACS tutorials: the flow here is identical by design. The `rddac` public surface mirrors `ddacs`, so everything you learned there ports by swapping the import.
 

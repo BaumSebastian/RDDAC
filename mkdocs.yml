@@ -79,6 +79,13 @@ nav:
       - Process Parameters: process-parameters.md
       - HDF5 Structure: hdf5-structure.md
       - Croissant Manifest: croissant.md
+  - Preprocessing:
+      - Overview: preprocessing/index.md
+      - Oil-Film Thickness: preprocessing/oil.md
+      - Press Force: preprocessing/force.md
+      - Sheet Thickness: preprocessing/sheet.md
+      - Point Clouds: preprocessing/pointcloud.md
+      - Custom Processing: preprocessing/custom.md
   - Tutorials:
       - Overview: tutorials/index.md
       - 1. Getting Started: tutorials/getting-started.md
@@ -87,6 +94,7 @@ nav:
       - 4. Visualization: tutorials/visualization.md
       - 5. Loose HDF5 recipe: tutorials/loose-h5.md
       - 6. Streaming and numpy export: tutorials/streaming.md
+      - 7. Preprocessing: tutorials/preprocessing.md
   - CLI Reference: cli.md
   - API Reference:
       - Overview: api/index.md

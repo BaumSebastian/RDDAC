@@ -43,6 +43,7 @@ NOTEBOOKS = [
     ("05_loose_h5.ipynb",        "RDDAC 05 Loose HDF5",                  "rddac"),
     # retitled: the original slug (…-numpy-export) was tombstoned by a failed create
     ("06_streaming.ipynb",       "RDDAC 06 Streaming and Export",        "rddac"),
+    ("07_preprocessing.ipynb",   "RDDAC 07 Preprocessing",               "rddac[preprocessing]"),
 ]
 
 
