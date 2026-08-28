@@ -7,6 +7,8 @@ independently of the package.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-28
+
 ### Added
 - `rddac preprocess`: reference preprocessing of the raw dataset into an ML-ready
   processed layer (`<data-dir>/processed`, raw files untouched): forming-window
@@ -53,6 +55,7 @@ independently of the package.
   PyTorch `RDDACDataset`, plotting helpers, documentation and six tutorial
   notebooks.
 
-[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/BaumSebastian/RDDAC/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/BaumSebastian/RDDAC/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/BaumSebastian/RDDAC/releases/tag/1.0.0
