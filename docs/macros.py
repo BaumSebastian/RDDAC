@@ -9,10 +9,12 @@ hand-maintained here.
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
 import rddac as _rddac
+from rddac import cli as _cli
 from rddac import croissant as _croissant
 from rddac.spec import RDDAC_SPEC
 
@@ -100,8 +102,60 @@ def _md_table(headers: list[str], rows: list[list[str]]) -> str:
     return f"{line}\n{sep}\n{body}"
 
 
+def _cli_parser(command: str | None = None) -> argparse.ArgumentParser:
+    """The top-level parser, or the sub-parser of ``command``."""
+    parser = _cli.build_parser()
+    if command is None:
+        return parser
+    sub = next(a for a in parser._actions if isinstance(a, argparse._SubParsersAction))
+    return sub.choices[command]
+
+
+def _fmt(text: str) -> str:
+    return " ".join((text or "").split()).replace("|", "\\|")
+
+
+def _cli_rows(parser: argparse.ArgumentParser, positional: bool) -> list[list[str]]:
+    rows = []
+    for act in parser._actions:
+        if act.help is argparse.SUPPRESS or isinstance(act, argparse._HelpAction | argparse._SubParsersAction):
+            continue
+        if bool(act.option_strings) == positional:
+            continue
+        if positional:
+            name = (act.metavar or act.dest).upper()
+            if act.nargs in ("?", "*"):
+                name = f"[{name}]"
+            default = f"`{act.default}`" if act.default not in (None, argparse.SUPPRESS) else ""
+            rows.append([f"`{name}`", default, _fmt(act.help)])
+        else:
+            flags = ", ".join(act.option_strings)
+            takes_value = (
+                not isinstance(act, argparse._StoreTrueAction | argparse._VersionAction | argparse._CountAction)
+                and act.nargs != 0
+            )
+            if takes_value:
+                value = act.metavar or (
+                    "{" + ",".join(map(str, act.choices)) + "}" if act.choices else act.dest.upper()
+                )
+                flags += f" {value}" + ("..." if act.nargs == "+" else "")
+            rows.append([f"`{flags}`", _fmt(act.help)])
+    return rows
+
+
 def define_env(env):
     """Plug-in entry point — mkdocs-macros calls this at build time."""
+
+    # ----- CLI reference generated from the argparse definitions -----
+    @env.macro
+    def cli_options(command: str | None = None) -> str:
+        """Option table of a subcommand (or of the top level when omitted)."""
+        return _md_table(["Option", "Description"], _cli_rows(_cli_parser(command), positional=False))
+
+    @env.macro
+    def cli_arguments(command: str) -> str:
+        """Positional-argument table of a subcommand."""
+        return _md_table(["Argument", "Default", "Description"], _cli_rows(_cli_parser(command), positional=True))
 
     # ----- simple value substitutions -----
     @env.macro

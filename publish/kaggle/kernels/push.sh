@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish the seven RDDAC tutorials as Kaggle Notebooks (Code tab), each attached
+# Publish the RDDAC tutorials as Kaggle Notebooks (Code tab), each attached
 # to the baumsebastian/rddac-teaser dataset.
 #
 # Prereqs: the rddac-teaser dataset already exists on Kaggle, and `kaggle` is on

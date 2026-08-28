@@ -14,7 +14,7 @@
 #
 # Source dir holding metadata.json + process_parameters.csv + h5/sample.zip.
 # Defaults to ./data; override with RDDAC_TEASER_SRC.
-# Files are dereferenced on copy. Nothing here is committed — publish/ is ignored.
+# Files are dereferenced on copy. Only .staging/ is git-ignored; the scripts are committed.
 set -euo pipefail
 
 PUB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # publish/

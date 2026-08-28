@@ -20,22 +20,13 @@ rddac download [VERSION] [OPTIONS]
 
 ### Arguments
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `VERSION` | `1.0` | Dataset version to download |
+{{ cli_arguments("download") }}
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--small` | Download the small test set ({{ small_download_size() }}): `sample.zip` (one experiment per category), `process_parameters.csv`, `metadata.json` |
-| `--no-sim` | Download only the real measurements; skip the DDACS simulations |
-| `--files FILE...` | Download only the listed files |
-| `--out PATH` | Output directory (default: `./data`) |
-| `--extract` | Extract zip files in place after download |
-| `--remove-zip` | Delete the zip file after a successful extraction (requires `--extract`) |
-| `-y, --yes` | Skip the confirmation prompt |
-| `-q, --quiet` | No output or progress; implies `--yes` |
+{{ cli_options("download") }}
+
+`--small` fetches {{ small_download_size() }}: `sample.zip` (one experiment per category), `process_parameters.csv`, `metadata.json`.
 
 ### Default behaviour
 
@@ -84,25 +75,13 @@ rddac preprocess [MODALITY ...] [OPTIONS]
 
 ### Arguments
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `MODALITY ...` | all | Subset of `force`, `sheet`, `oil`, `pointcloud` (`pointcloud` covers both scan grids, `z` and `luminescence`). Without an explicit list, `pointcloud` is skipped with a notice when the DDACS simulations (or the `rddac[preprocessing]` extra) are missing; named explicitly, it fails with an actionable error instead. |
+{{ cli_arguments("preprocess") }}
+
+`pointcloud` covers both scan grids, `z` and `luminescence`. Without an explicit modality list, `pointcloud` is skipped with a notice when the DDACS simulations (or the `rddac[preprocessing]` extra) are missing; named explicitly, it fails with an actionable error instead.
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--data-dir PATH` | Directory holding the raw dataset — zips or loose `.h5` (default: `./data`) |
-| `--out PATH` | Output directory for processed files (default: `<data-dir>/processed`) |
-| `--ids IDS` | Experiment selection, e.g. `0-999` or `42,1035` |
-| `--split {train,val,test}` | Restrict to one of the predefined splits |
-| `--workers N` | Parallel workers (default: 1) |
-| `--overwrite` | Recompute modalities that already exist in the output files |
-| `--config TOML` | TOML file overriding processing parameters |
-| `--dump-config` | Print the default processing parameters as TOML and exit |
-| `--rebuild-models` | Force retraining of the cached fin-classifier models (pointcloud stage) |
-| `-y, --yes` | Skip the confirmation prompt |
-| `-q, --quiet` | No output or progress bars; implies `--yes` |
+{{ cli_options("preprocess") }}
 
 ### Default behaviour
 
@@ -127,7 +106,4 @@ rddac preprocess --split train --data-dir /mnt/rddac --out /mnt/rddac-processed
 
 ## Global Options
 
-| Option | Description |
-|--------|-------------|
-| `--token TOKEN` | DaRUS API token (used to download draft versions) |
-| `-V, --version` | Show the package version and exit |
+{{ cli_options() }}

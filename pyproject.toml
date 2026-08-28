@@ -30,9 +30,7 @@ dependencies = [
     "pandas>=2.0.0",
     "h5py>=3.8.0",
     "matplotlib>=3.7.0",
-    # CLI dependencies
-    "requests>=2.28.0",
-    "humanfriendly>=10.0",
+    # CLI dependencies (the download itself is delegated to ddacs, which brings requests/humanfriendly)
     "rich>=13.0.0",
     # Croissant manifest access
     "mlcroissant>=1.1.0",
@@ -86,7 +84,7 @@ include = ["rddac*"]
 
 [tool.black]
 line-length = 120
-target-version = ["py310", "py311", "py312"]
+target-version = ["py310", "py311", "py312", "py313"]
 
 [tool.ruff]
 line-length = 120

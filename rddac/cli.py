@@ -141,8 +141,8 @@ def _download_simulations(args: argparse.Namespace) -> int:
     return 1
 
 
-def main() -> None:
-    """CLI entry point for RDDAC dataset commands."""
+def build_parser() -> argparse.ArgumentParser:
+    """The ``rddac`` argument parser (also used to render the CLI reference)."""
     parser = argparse.ArgumentParser(
         prog="rddac", description="RDDAC Dataset CLI - Download experimental data from DaRUS"
     )
@@ -154,19 +154,26 @@ def main() -> None:
 
     dl = sub.add_parser("download", help="Download dataset files")
     dl.add_argument("version", nargs="?", default=DEFAULT_VERSION, help=f"Dataset version (default: {DEFAULT_VERSION})")
-    dl.add_argument("--files", nargs="+", help="Specific filenames to download")
+    dl.add_argument("--files", nargs="+", metavar="FILE", help="Specific filenames to download")
     dl.add_argument("--small", action="store_true", help="Download the small sample bundle")
     dl.add_argument(
         "--no-sim", action="store_true", help="Download only the real measurements (skip the DDACS simulations)"
     )
-    dl.add_argument("--out", default=DEFAULT_DATA_DIR, help=f"Output directory (default: {DEFAULT_DATA_DIR})")
+    dl.add_argument(
+        "--out", metavar="PATH", default=DEFAULT_DATA_DIR, help=f"Output directory (default: {DEFAULT_DATA_DIR})"
+    )
     dl.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt")
     dl.add_argument("-q", "--quiet", action="store_true", help="No output or progress bars; implies --yes")
     dl.add_argument("--extract", action="store_true", help="Extract downloaded zips into their directory")
     dl.add_argument("--remove-zip", action="store_true", help="Delete zips after extraction (with --extract)")
 
     add_preprocess_parser(sub)
+    return parser
 
+
+def main() -> None:
+    """CLI entry point for RDDAC dataset commands."""
+    parser = build_parser()
     args = parser.parse_args()
     if args.command == "info":
         cmd_info(args)

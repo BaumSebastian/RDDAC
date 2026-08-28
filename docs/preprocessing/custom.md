@@ -7,7 +7,7 @@
 | Level | When | How |
 | --- | --- | --- |
 | 1. Change parameters | the algorithm is fine, a threshold or window is not | `--config my.toml`, no code |
-| 2. Replace one step | you want a different filter for one modality, our stages for the rest | write that modality's group yourself, let `rddac preprocess` do the others |
+| 2. Replace one step | you want a different filter for one modality, the reference stages for the rest | write that modality's group yourself, let `rddac preprocess` do the others |
 | 3. Replace everything | a different pipeline altogether | produce files matching the schema in your own directory |
 
 ### Level 1: parameters
@@ -71,7 +71,7 @@ for exp_id in sorted(available_ids(DATA_DIR) or []):
 rddac preprocess force sheet        # the reference stages fill in the other groups
 ```
 
-The result is one processed layer: your oil profiles next to our force and sheet tables, streamable through the same views (`iter_view("oil-thickness", data_dir="./data/processed", source="./data/metadata.json")`). To compare against the reference, run `rddac preprocess oil --out ./data/reference` and plot both.
+The result is one processed layer: your oil profiles next to the reference force and sheet tables, streamable through the same views (`iter_view("oil-thickness", data_dir="./data/processed", source="./data/metadata.json")`). To compare against the reference, run `rddac preprocess oil --out ./data/reference` and plot both.
 
 ### Level 3: the contract
 
@@ -94,12 +94,12 @@ for exp_id in range(9000):
         group.attrs["producer"] = "my_better_oil v1"            # honest provenance
 ```
 
-Files that match the schema are consumable by the same downstream tooling as ours. Because raw data is canonical and pinned by the published Croissant manifest, *anyone* can reproduce your processed layer from your code: replacing an algorithm always means running it yourself; there is nothing server-side to swap.
+Files that match the schema are consumable by the same downstream tooling as the reference output. Because raw data is canonical and pinned by the published Croissant manifest, *anyone* can reproduce your processed layer from your code: replacing an algorithm always means running it yourself; there is nothing server-side to swap.
 
 Two conventions keep replacements honest:
 
 - **Never write into the raw directory**: the published checksums are the dataset's identity.
-- **Stamp what you did** into the group attributes (our stages record every parameter used), so a processed file documents itself even when separated from the code.
+- **Stamp what you did** into the group attributes (the reference stages record every parameter used), so a processed file documents itself even when separated from the code.
 
 ## Internal reference
 

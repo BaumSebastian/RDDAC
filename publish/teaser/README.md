@@ -1,6 +1,6 @@
 # RDDAC — Real Deep Drawing and Cutting Dataset
 
-[![Code License: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Dataset License: CC BY 4.0](https://img.shields.io/badge/Dataset-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Documentation](https://img.shields.io/badge/docs-readthedocs.io-blue.svg)](https://rddac.readthedocs.io) [![DaRUS Repository](https://img.shields.io/badge/repository-DaRUS-green.svg)](https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-5589) [![DOI](https://img.shields.io/badge/DOI-10.18419%2FDARUS--5589-blue.svg)](https://doi.org/10.18419/DARUS-5589)
+[![Code License: MIT](https://img.shields.io/badge/Code-MIT-yellow.svg)](https://github.com/BaumSebastian/RDDAC/blob/main/LICENSE) [![Dataset License: CC BY 4.0](https://img.shields.io/badge/Dataset-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Documentation](https://img.shields.io/badge/docs-readthedocs.io-blue.svg)](https://rddac.readthedocs.io) [![DaRUS Repository](https://img.shields.io/badge/repository-DaRUS-green.svg)](https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-5589) [![DOI](https://img.shields.io/badge/DOI-10.18419%2FDARUS--5589-blue.svg)](https://doi.org/10.18419/DARUS-5589)
 
 ![Measured point clouds after OP10 and OP20, colored by deviation from the matching DDACS simulation](https://raw.githubusercontent.com/BaumSebastian/RDDAC/main/docs/images/sim2real_sweep.gif)
 
@@ -23,8 +23,7 @@
 ## About this sample
 
 This is a **~174 MB teaser** of RDDAC — 18 experiments (one per category) plus the
-Croissant 1.1 manifest, the complete process-parameter table, and the seven tutorial
-notebooks — so you can explore the schema and run every tutorial in seconds before
+Croissant 1.1 manifest, the complete process-parameter table, and the dataset documentation — so you can explore the schema and run every tutorial in seconds before
 committing to the full download.
 
 ```
@@ -33,7 +32,8 @@ data/
   process_parameters.csv    parameters + splits for all 9,000 experiments
   h5/sample.zip             18 experiments, one per category (all modalities)
 rddac_documentation.pdf     dataset documentation
-notebooks/                  seven end-to-end tutorials (see notebooks/README.md)
+notebooks/                  the tutorial notebooks (Hugging Face bundle only; on Kaggle
+                            they are the attached Code notebooks)
 ```
 
 **Croissant manifest.** `data/metadata.json` is the
@@ -86,16 +86,7 @@ for batch in DataLoader(ds, batch_size=1, num_workers=0):
 
 ## Tutorials
 
-Seven end-to-end notebooks ship in `notebooks/` and are published on
-[Read the Docs](https://rddac.readthedocs.io/en/latest/tutorials/):
-
-1. **Getting started** — install, inspect one experiment, 3D point cloud plot.
-2. **Build your own view** — `rddac.add_view`, manifest inspection, custom RecordSets.
-3. **PyTorch training** — `RDDACDataset`, filters, train/val/test splits.
-4. **Visualization** — scans, point clouds, force curves, traverses.
-5. **Loose HDF5 recipe** — pandas + `h5py` after `--extract --remove-zip`.
-6. **Streaming & numpy export** — `iter_view`, `export_to_numpy`.
-7. **Preprocessing** — `rddac preprocess`, self-describing outputs, processing figures, the processed layer through the same views.
+The end-to-end tutorial notebooks live in the [GitHub repository](https://github.com/BaumSebastian/RDDAC/tree/main/notebooks) and are published on [Read the Docs](https://rddac.readthedocs.io/en/latest/tutorials/); on Hugging Face they are bundled in `notebooks/`, on Kaggle they are the notebooks attached to this dataset.
 
 ## Relationship to DDACS
 

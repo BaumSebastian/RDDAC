@@ -2,8 +2,6 @@
   "record_id": "21274093",
   "metadata": {
     "title": "Real Deep Drawing and Cutting (RDDAC) Dataset - Teaser",
-    "doi": "10.18419/DARUS-5589",
-    "publication_date": "2026-07-09",
     "description": "<p>A ~174 MB sample of the <strong>RDDAC</strong> dataset: 18 physical deep-drawing and cutting experiments (one per parameter category) with press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans, plus the Croissant 1.1 manifest, the process parameter table for all 9,000 experiments, and the dataset documentation PDF.</p><p>RDDAC is the experimental counterpart to the DDACS simulation dataset (<a href=\"https://doi.org/10.18419/DARUS-4801\">doi:10.18419/DARUS-4801</a>): same cup geometry, same DP600 steel, same two-stage process. Use it to quantify the simulation-to-reality gap or train models on real process data.</p><p><strong>This record is a discovery sample.</strong> The full release (9,000 experiments, ~87 GB of lossless HDF5, predefined 7,200/900/900 train/val/test split) is hosted on DaRUS. Please cite the dataset there: <a href=\"https://doi.org/10.18419/DARUS-5589\">doi:10.18419/DARUS-5589</a>.</p><p>Quickstart: <code>pip install rddac</code> &middot; Docs: <a href=\"https://rddac.readthedocs.io\">rddac.readthedocs.io</a> &middot; Source: <a href=\"https://github.com/BaumSebastian/RDDAC\">github.com/BaumSebastian/RDDAC</a></p><p>License: data CC BY 4.0, package code MIT.</p><p><em>Layout note: to use this bundle with the <code>rddac</code> package, place <code>sample.zip</code> under <code>data/h5/</code> next to <code>process_parameters.csv</code> and the manifest. This is the layout that <code>rddac download --small</code> creates. Zenodo stores files flat, so the folder cannot be preserved here.</em></p>",
     "access_right": "open",
     "creators": [
@@ -43,6 +41,12 @@
         "relation": "isDocumentedBy",
         "resource_type": "publication-softwaredocumentation",
         "scheme": "url"
+      },
+      {
+        "identifier": "10.18419/DARUS-5589",
+        "relation": "isDerivedFrom",
+        "resource_type": "dataset",
+        "scheme": "doi"
       }
     ],
     "dates": [

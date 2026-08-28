@@ -29,17 +29,23 @@ def add_preprocess_parser(sub: argparse._SubParsersAction) -> None:
     """Attach the ``preprocess`` subcommand to the main CLI's subparsers."""
     p = sub.add_parser("preprocess", help="Process raw measurements into the ML-ready layout")
     p.add_argument(
-        "modalities", nargs="*", metavar="modality", help=f"Subset of: {', '.join(MODALITIES)} (default: all)"
+        "modalities", nargs="*", metavar="MODALITY", help=f"Subset of: {', '.join(MODALITIES)} (default: all)"
     )
     p.add_argument(
         "--data-dir",
+        metavar="PATH",
         default=RDDAC_SPEC.default_data_dir,
         help=f"Directory holding the raw dataset (default: {RDDAC_SPEC.default_data_dir})",
     )
-    p.add_argument("--out", default=None, help="Output directory for processed files (default: <data-dir>/processed)")
-    p.add_argument("--ids", help="Experiment id selection, e.g. '0-999' or '42,1035'")
+    p.add_argument(
+        "--out",
+        metavar="PATH",
+        default=None,
+        help="Output directory for processed files (default: <data-dir>/processed)",
+    )
+    p.add_argument("--ids", metavar="IDS", help="Experiment id selection, e.g. '0-999' or '42,1035'")
     p.add_argument("--split", choices=["train", "val", "test"], help="Restrict to one of the predefined splits")
-    p.add_argument("--workers", type=int, default=1, help="Parallel workers (default: 1)")
+    p.add_argument("--workers", metavar="N", type=int, default=1, help="Parallel workers (default: 1)")
     p.add_argument(
         "--overwrite", action="store_true", help="Recompute modalities that already exist in the output files"
     )

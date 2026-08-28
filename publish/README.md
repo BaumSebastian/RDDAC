@@ -1,7 +1,7 @@
 # Publishing the RDDAC teaser
 
 Publishes the ~174 MB sample (manifest + CSV + 18 experiments + docs) to **Kaggle**
-and **Hugging Face**, plus the seven tutorials as **Kaggle notebooks**. The full
+and **Hugging Face**, plus the tutorial notebooks as **Kaggle notebooks**. The full
 ~87 GB dataset stays on DaRUS; this is the discovery teaser.
 
 The scripts here are committed and run in CI (`.github/workflows/publish.yml`);
@@ -57,7 +57,7 @@ That's it. Re-run any of the three to update that target.
 | Command | What it uploads | Notes |
 |---|---|---|
 | `kaggle/upload.sh {create,version}` | staged files + `dataset-metadata.json` | `--dir-mode zip`; Kaggle **auto-extracts** the h5 zip. Page **description + column docs come from `dataset-metadata.json`**, not the README. `version` first pulls current metadata to avoid the "non current" error. |
-| `kaggle/kernels/push.sh` | 7 notebooks as kernels | `build.py` adapts each (pip install, `rddac download --small`, 87 GB CTA) and attaches the dataset. |
+| `kaggle/kernels/push.sh` | the tutorial notebooks as kernels | `build.py` adapts each (pip install, `rddac download --small`, 87 GB CTA) and attaches the dataset. |
 | `huggingface/upload.sh` | staged files + `notebooks/` + card | Card = `card-header.md` (YAML) + `teaser/README.md`. HF does **not** extract zips, so `rddac.load` works off the repo. |
 
 ## Editing content (single source)

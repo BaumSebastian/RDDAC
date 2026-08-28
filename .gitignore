@@ -215,3 +215,6 @@ __marimo__/
 
 # Teaser publishing: scripts/cards are committed (CI runs them); only staging is local
 publish/.staging/
+
+# Local working notes
+TODO.md

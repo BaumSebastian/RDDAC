@@ -1,6 +1,6 @@
 # RDDAC notebooks
 
-Seven end-to-end Jupyter notebooks that companion the [online documentation](https://rddac.readthedocs.io). Each notebook is self-contained: it opens with a Walkthrough list and the Assumptions it relies on, then walks through the topic step by step. Reading top to bottom is the intended flow.
+End-to-end Jupyter notebooks that companion the [online documentation](https://rddac.readthedocs.io). Each notebook is self-contained: it opens with a Walkthrough list and the Assumptions it relies on, then walks through the topic step by step. Reading top to bottom is the intended flow.
 
 RDDAC is the experimental counterpart to the [DDACS](https://ddacs.readthedocs.io) simulation dataset, and the `rddac` package mirrors the `ddacs` API 1:1 — these notebooks mirror the DDACS notebook series the same way.
 
@@ -20,6 +20,9 @@ rddac download --small -y
 The full release (`rddac download`, ~87 GB) additionally fetches the matching DDACS simulations into `./data/simulation/`; the notebooks only need the small bundle. Notebooks 05 and 06 write throwaway artifacts into the system temp directory and clean up after themselves, so the data directory stays untouched.
 
 ## Run
+
+For headless re-execution (`jupyter execute --inplace`), put the project's virtual environment first on `PATH` (`PATH=.venv/bin:$PATH`): the `python3` kernelspec launches plain `python`, so whichever interpreter comes first is the one the notebook runs in.
+
 
 From the repository root:
 
