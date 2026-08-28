@@ -76,7 +76,9 @@ def process_experiment(raw, out, *, data_dir: str | Path, overwrite: bool, **par
     """
     if "pointcloud" not in raw:
         return "no_group"
-    if "pointcloud" in out and not overwrite:
+    # A group without op10/op20 is the leftover of an interrupted run (the old
+    # content was deleted before the new one was written): recompute it.
+    if "pointcloud" in out and len(out["pointcloud"]) and not overwrite:
         return "exists"
     ctx = _context(data_dir, params, Path(out.filename).parent)
 
@@ -139,16 +141,16 @@ def _process_op(raw, pc_group, op: str, sim_pts: np.ndarray, ctx: dict, group_ke
     component_seeds = geometry.seed_small_components(points, min_component)
     pre_icp = angle_seeds | component_seeds
 
-    rotation, translation, icp_stats = geometry.run_icp(
-        points[~pre_icp],
+    anchor_height = p.get("icp_anchor_height_mm", d.PC_ICP_ANCHOR_HEIGHT_MM)
+    aligned, rotation, translation, icp_stats = geometry.align_to_simulation(
+        points,
         sim_pts,
+        inlier_mask=~pre_icp,
+        anchor_height_mm=anchor_height,
         max_iterations=p.get("icp_max_iterations", d.PC_ICP_MAX_ITERATIONS),
         n_sample=p.get("icp_sample_size", d.PC_ICP_SAMPLE_SIZE),
         seed=d.PC_SEED,
     )
-    aligned = points @ rotation.T + translation
-    z_offset = geometry.z_at_center(aligned[~pre_icp]) - geometry.z_at_center(sim_pts)
-    aligned[:, 2] -= z_offset
 
     tree_aligned = cKDTree(aligned[:, :2])
     mono_seeds = geometry.seed_radial_monotonicity(
@@ -202,9 +204,9 @@ def _process_op(raw, pc_group, op: str, sim_pts: np.ndarray, ctx: dict, group_ke
     op_group.attrs["x_mm_per_pixel"] = calib["x_mm_per_pixel"]
     op_group.attrs["y_mm_per_pixel"] = y_mm_per_px
     op_group.attrs["z_mm_per_unit"] = calib["z_mm_per_unit"]
-    op_group.attrs["icp_rotation"] = rotation
+    op_group.attrs["icp_rotation"] = rotation  # complete transform: z = raw @ R.T + t (z offsets included)
     op_group.attrs["icp_translation"] = translation
-    op_group.attrs["icp_z_offset"] = z_offset
+    op_group.attrs["icp_anchor_height_mm"] = anchor_height
     for key, value in icp_stats.items():
         op_group.attrs[key] = value
     op_group.attrs["n_valid_pixels"] = int(valid.sum())

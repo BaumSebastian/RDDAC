@@ -80,6 +80,13 @@ class TestFigures:
             visualize.plot_pointcloud_processing(z, lumi, processed)  # default 20040-px threshold
         assert "12.3 % removed" in fig.axes[1].get_title()
         assert "1,200 points" in fig.axes[0].get_title()
+        sim = np.random.default_rng(1).normal(size=(80, 3))
+        fig = visualize.plot_pointcloud_processing(
+            z, lumi, processed, sim_points=sim, stats={"simulation_id": 4242}, lumi_min_patch_size=100
+        )
+        titles = [ax.get_title() for ax in fig.axes]
+        assert any("Matched simulation 4242" in t for t in titles)
+        assert any("Distance to simulation" in t and "median" in t for t in titles)
 
     def test_params_are_forwarded(self):
         fig = visualize.plot_force_processing([_force()], time_window_start=0.5, time_window_end=1.5)
@@ -112,6 +119,6 @@ class TestCli:
             g.create_dataset("luminescence", data=lumi.ravel())
         out = tmp_path / "img"
         visualize.main(["luminescence", "--data-dir", str(tmp_path), "--id", "1", "--out", str(out)])
-        assert (out / "luminescence_processing_op10.png").is_file()
+        assert (out / "luminescence_processing_scan_op10.png").is_file()
         with pytest.raises(SystemExit, match="processed file not found"):
             visualize.main(["pointcloud", "--data-dir", str(tmp_path), "--id", "1", "--out", str(out)])

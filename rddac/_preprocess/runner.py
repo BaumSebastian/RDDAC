@@ -255,10 +255,15 @@ def run(
     t0 = time.time()
     results = []
 
+    # Chunking amortises the pool overhead for the millisecond-scale modalities;
+    # the pointcloud stage takes ~100 s per experiment, where a chunk of 8 would
+    # keep the progress bar at 0 for a quarter of an hour.
+    chunksize = 1 if "pointcloud" in names else 8
+
     def _iter_results():
         if workers > 1:
             with Pool(workers) as pool:
-                yield from pool.imap_unordered(_process_one, jobs, chunksize=8)
+                yield from pool.imap_unordered(_process_one, jobs, chunksize=chunksize)
         else:
             yield from map(_process_one, jobs)
 

@@ -3,6 +3,14 @@
 Ported from the validated internal pipeline. All functions are pure and
 operate on numpy arrays; nothing here touches files except
 :func:`load_calibration`, which reads the packaged ``calibration.json``.
+
+Performance note: the seed stages build kNN graphs over ~3 M points per scan
+(1.5-2 min per experiment). Since the points lie on the regular pixel grid,
+they could be reformulated as image operations on the z grid (gradients,
+``ndimage`` labelling/closing) for an estimated 2-3x speed-up. Not done yet:
+it changes the validated detection and needs re-validation against the
+bundled labels plus a classifier retrain. See the "Runtime" section of the
+Point Clouds documentation page.
 """
 
 from __future__ import annotations
@@ -294,3 +302,70 @@ def run_icp(
         "icp_whisker_high": float(min(np.max(final_distances), q3 + 1.5 * iqr)),
     }
     return r_total, t_total, stats
+
+
+def align_to_simulation(
+    points: np.ndarray,
+    sim_pts: np.ndarray,
+    *,
+    inlier_mask: np.ndarray | None = None,
+    anchor_height_mm: float = 3.0,
+    max_iterations: int = 50,
+    n_sample: int = 50000,
+    seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict]:
+    """Rigidly align a scan to its simulation, anchored on the cup.
+
+    Two ICP passes. The first uses all inlier points and brings the scan into
+    the simulation frame; it is robust while fins are still present. The
+    second is restricted to the cup (bottom and walls): every point higher
+    than the simulation's flange level plus ``anchor_height_mm``, selected
+    identically on both sides. This keeps the flange, the region most
+    affected by springback and draw-in, from biasing the pose, so the
+    remaining wall and radius deviations are attributed to the part, not to
+    the alignment. After each pass the z offset is fixed at the cup centre.
+
+    Args:
+        points: ``(N, 3)`` calibrated scan points.
+        sim_pts: ``(M, 3)`` simulation points (mirrored full part).
+        inlier_mask: Optional ``(N,)`` boolean mask of points to fit on
+            (e.g. everything except geometric outlier seeds). All points are
+            transformed regardless.
+        anchor_height_mm: Height above the simulation's flange from which
+            points count as cup.
+        max_iterations: ICP iterations per pass.
+        n_sample: ICP subsample size per pass.
+        seed: Subsampling seed (reproducible runs).
+
+    Returns:
+        ``(aligned, rotation, translation, stats)``: the transformed points,
+        the composed rigid transform (``aligned == points @ rotation.T +
+        translation``, z offsets included), and the ICP statistics of the
+        cup pass plus ``n_anchor_points``.
+    """
+    inlier = np.ones(len(points), dtype=bool) if inlier_mask is None else inlier_mask
+    z_axis = np.array([0.0, 0.0, 1.0])
+
+    rotation_1, translation_1, _ = run_icp(points[inlier], sim_pts, max_iterations, n_sample, seed)
+    aligned = points @ rotation_1.T + translation_1
+    z_offset_1 = z_at_center(aligned[inlier]) - z_at_center(sim_pts)
+    aligned[:, 2] -= z_offset_1
+
+    flange_z = float(np.percentile(sim_pts[:, 2], 0.5)) + anchor_height_mm
+    cup = inlier & (aligned[:, 2] > flange_z)
+    sim_cup = sim_pts[sim_pts[:, 2] > flange_z]
+    if cup.sum() < 1000 or len(sim_cup) < 100:  # degenerate scan: keep the first pass
+        rotation = rotation_1
+        translation = translation_1 - z_offset_1 * z_axis
+        stats = {"n_anchor_points": int(cup.sum())}
+        return aligned, rotation, translation, stats
+
+    rotation_2, translation_2, stats = run_icp(aligned[cup], sim_cup, max_iterations, n_sample, seed)
+    aligned = aligned @ rotation_2.T + translation_2
+    z_offset_2 = z_at_center(aligned[inlier]) - z_at_center(sim_pts)
+    aligned[:, 2] -= z_offset_2
+
+    rotation = rotation_2 @ rotation_1
+    translation = rotation_2 @ (translation_1 - z_offset_1 * z_axis) + translation_2 - z_offset_2 * z_axis
+    stats = dict(stats, n_anchor_points=int(cup.sum()))
+    return aligned, rotation, translation, stats

@@ -24,7 +24,7 @@ import sklearn
 from .. import defaults as d
 
 #: Bump when the feature schema or bundle layout changes (forces retrain).
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2: cup-anchored two-pass alignment (sim-distance features changed)
 SIMDIST_METHOD = "kd"
 
 CACHE_SUBDIR = Path("models") / "pointcloud_fin_rf"
@@ -100,6 +100,14 @@ def save_bundles(cache_root: str | Path, bundles: dict[str, dict], meta_extra: d
 
 
 def predict_outliers(bundle: dict, x: np.ndarray, threshold: float = d.PC_RF_THRESHOLD) -> np.ndarray:
-    """Outlier mask from a bundle's model at the given probability threshold."""
-    proba = bundle["model"].predict_proba(x)[:, 1]
+    """Outlier mask from a bundle's model at the given probability threshold.
+
+    Prediction runs single-threaded: the runner parallelises over experiments
+    (one process per worker), and nested joblib parallelism inside a worker
+    would only fall back to one thread with a warning.
+    """
+    model = bundle["model"]
+    if getattr(model, "n_jobs", 1) != 1:
+        model.set_params(n_jobs=1)
+    proba = model.predict_proba(x)[:, 1]
     return proba >= threshold

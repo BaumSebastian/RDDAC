@@ -19,7 +19,7 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 
 1. **Validity mask**: connected-component filtering of the luminescence grid plus `z > 0`.
 
-    <img src="../../images/preprocessing/luminescence_processing_op10.png" width="900">
+    <img src="../../images/preprocessing/luminescence_processing_concave_op10.png" width="900">
 
     *Luminescence of one OP10 scan: raw grid (a), connected foreground patches (b), the validity mask after the patch-size filter (c), and the packed `uint8` image written to the processed file (d).*
 
@@ -33,13 +33,16 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 
     - *radial monotonicity*: on a formed cup, z must not increase moving outward from the part center;
     - *small 3D components*: floating clusters below the minimum size.
-4. **Simulation matching + ICP**: the matching simulation is selected by geometry and blankholder force (hard) plus sheet thickness and oil-derived friction coefficient (soft, nearest); the scan is rigidly aligned to it (seeded, reproducible ICP).
+4. **Simulation matching + ICP**: the matching simulation is selected by geometry and blankholder force (hard) plus sheet thickness and oil-derived friction coefficient (soft, nearest); the scan is rigidly aligned to it in two seeded, reproducible ICP passes: a first pass on all inlier points brings the scan into the simulation frame; a second pass **anchored on the cup** (bottom and walls, every point more than `icp_anchor_height_mm` above the simulation's flange level) fixes the pose. The flange, the region most affected by springback and draw-in, therefore does not bias the alignment, and the remaining wall and radius deviations belong to the part. The z offset is fixed at the cup centre after each pass; the stamped `icp_rotation`/`icp_translation` is the complete transform from the scanner frame.
 5. **RF fin classifier**: a random forest over local surface features plus three cross-sample features in a registered common frame: a position prior $P(\text{outlier}\mid\text{position})$, the slope-normalized deviation from the consensus surface, and the registered coordinates. Removal uses `predict_proba` against a configurable threshold, the precision/recall knob.
 6. **Final sweep**: small 3D components orphaned by the removal are dropped.
 
-<img src="../../images/preprocessing/pointcloud_processing_op10.png" width="700">
+<img src="../../images/preprocessing/pointcloud_processing_concave_op10.png" width="900">
+<img src="../../images/preprocessing/pointcloud_processing_concave_op20.png" width="900">
+<img src="../../images/preprocessing/pointcloud_processing_convex_op10.png" width="900">
+<img src="../../images/preprocessing/pointcloud_processing_convex_op20.png" width="900">
 
-*One OP10 scan in top view, coloured by height: the raw calibrated scan after the validity mask (left) and the processed, ICP-aligned point cloud (right); the gaps are the removed fins and outliers.*
+*Experiments 0 (concave) and 4500 (convex), both part of the small bundle and processed with the simulations present, in top view, OP10 (deep drawing) and OP20 (cutting) each: (a) the raw calibrated scan after the validity mask, (b) the processed, ICP-aligned point cloud (gaps are the removed fins and outliers), (c) the matched DDACS simulation in the same frame, and (d) the processed points coloured by their nearest-neighbour distance to the simulation, the same `kd` sim-distance feature the fin classifier uses.*
 
 ## The classifier is retrained on your machine
 
@@ -52,6 +55,13 @@ Trained models are derived artifacts and are **not distributed**. The bundled la
 | convex OP10 | 0.94 | 0.99 |
 | convex OP20 | 0.96 | 0.96 |
 
+## Runtime
+
+Expect roughly **1.5 to 2 minutes per experiment and worker** (single core): every stage works on the ~3 million valid points of a scan with kNN graphs (surface angle, radial monotonicity, component filter, morphological closing) plus two ICP passes and the random-forest prediction, and none of these dominates. Use `--workers N` up to the number of free cores (about 2 GB of memory per worker), or split the ids across machines that share the output directory (`--ids 0-4499` / `--ids 4500-8999`). Interrupted runs resume: re-running without `--overwrite` skips finished files.
+
+!!! note "Not implemented: grid-based outlier detection"
+    The scan points lie on a regular pixel grid, so the kNN-based seed stages could be expressed as image operations on the `z` grid (gradients for the surface angle, `ndimage` labelling and closing for components), which would cut the runtime by an estimated factor of 2 to 3. This is deliberately not implemented yet: it changes the validated outlier detection and would need re-validation against the bundled labels and a retrain of the fin classifier. Contributions welcome.
+
 ## Parameters
 
 | TOML key (`[pointcloud]`) | Default | Meaning |
@@ -62,7 +72,8 @@ Trained models are derived artifacts and are **not distributed**. The bundled la
 | `min_component_size` | 50 | 3D component filter (seed stage + final sweep) |
 | `k_angle` / `k_mono` / `k_closing` | 15 / 20 / 8 | kNN sizes |
 | `max_closing_iter` | 15 | upper bound on morphological-closing iterations |
-| `icp_max_iterations` / `icp_sample_size` | 50 / 50000 | ICP effort |
+| `icp_max_iterations` / `icp_sample_size` | 50 / 50000 | ICP effort (per pass) |
+| `icp_anchor_height_mm` | 3.0 | second ICP pass uses only points this far above the simulation's flange level (the cup) |
 | `rf_threshold` | 0.5 | fin-classifier decision threshold (higher = more conservative removal) |
 | `rf_n_estimators` / `rf_max_depth` | 150 / 18 | RF hyperparameters (changing them retrains) |
 | `keep_prepared` | false | keep the prepared training grids after a successful retrain (debugging aid) |

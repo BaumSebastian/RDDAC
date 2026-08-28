@@ -9,6 +9,7 @@
 [![Documentation](https://readthedocs.org/projects/rddac/badge/?version=latest)](https://rddac.readthedocs.io)
 [![DaRUS Repository](https://img.shields.io/badge/repository-DaRUS-green.svg)](https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-5589)
 [![DOI](https://img.shields.io/badge/DOI-10.18419%2FDARUS--5589-blue.svg)](https://doi.org/10.18419/DARUS-5589)
+[![Paper](https://img.shields.io/badge/paper-Trans%20Indian%20Inst%20Met-red.svg)](https://doi.org/10.1007/s12666-026-03870-5)
 
 <div align="center">
 

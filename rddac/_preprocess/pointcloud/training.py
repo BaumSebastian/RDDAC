@@ -103,15 +103,14 @@ def prepare_task(
     valid = geometry.lumi_valid_mask(lumi_2d, cfg.get("lumi_min_patch_size", d.PC_LUMI_MIN_PATCH_SIZE)) & (z_2d > 0)
     y_mm_per_px = geometry.y_calibration(valid, calib["x_mm_per_pixel"])
     points = geometry.extract_points(z_2d, valid, calib["x_mm_per_pixel"], y_mm_per_px, calib["z_mm_per_unit"])
-    rotation, translation, _ = geometry.run_icp(
+    aligned, _, _, _ = geometry.align_to_simulation(
         points,
         sim_pts,
+        anchor_height_mm=cfg.get("icp_anchor_height_mm", d.PC_ICP_ANCHOR_HEIGHT_MM),
         max_iterations=cfg.get("icp_max_iterations", d.PC_ICP_MAX_ITERATIONS),
         n_sample=cfg.get("icp_sample_size", d.PC_ICP_SAMPLE_SIZE),
         seed=d.PC_SEED,
     )
-    aligned = points @ rotation.T + translation
-    aligned[:, 2] -= geometry.z_at_center(aligned) - geometry.z_at_center(sim_pts)
 
     z_grid = np.full(z_2d.shape, np.nan, dtype=np.float32)
     z_grid[valid] = aligned[:, 2].astype(np.float32)

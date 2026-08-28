@@ -284,22 +284,28 @@ def plot_pointcloud_processing(
     lumi_2d: np.ndarray,
     processed_points: np.ndarray,
     *,
+    sim_points: np.ndarray | None = None,
     stats: dict | None = None,
     max_points: int = 300_000,
-    figsize: tuple[float, float] = FIGSIZE,
+    figsize: tuple[float, float] | None = None,
     **params,
 ) -> Figure:
-    """Two top-view panels: the raw calibrated scan and the processed point cloud.
+    """Top-view panels: raw calibrated scan, processed cloud, and optionally
+    the matched simulation and the distance to it.
 
     The raw panel applies only the validity mask and the calibration (steps
     1–2 of the stage); the processed panel is the stage's output (cleaned,
     ICP-aligned to the matched simulation), so gaps between the two are the
-    removed artifacts. Both are coloured by height.
+    removed artifacts. With ``sim_points`` two more panels follow: the
+    simulation in the same frame, and the processed points coloured by their
+    nearest-neighbour distance to it (the ``kd`` sim-distance feature).
 
     Args:
         z_2d: ``(H, W)`` raw z grid (sensor units).
         lumi_2d: ``(H, W)`` raw luminescence grid (for the validity mask).
         processed_points: ``(N, 3)`` processed ``pointcloud/<op>/z``.
+        sim_points: ``(M, 3)`` matched simulation points (mirrored full part),
+            e.g. ``SimContext(data_dir).points(simulation_id, op)``.
         stats: The processed group's attrs; when given, removal counts are
             shown in the panel title.
         max_points: Subsampling cap per panel (keeps the figure light).
@@ -327,26 +333,56 @@ def plot_pointcloud_processing(
         return points[rng.choice(len(points), size=max_points, replace=False)]
 
     raw_s, proc_s = _subsample(raw_points), _subsample(processed_points)
-    z_all = np.concatenate([raw_s[:, 2], proc_s[:, 2]]) if len(proc_s) else raw_s[:, 2]
-    vmin, vmax = (np.percentile(z_all, 1), np.percentile(z_all, 99)) if len(z_all) else (0, 1)
+    sim_s = _subsample(np.asarray(sim_points, dtype=float)) if sim_points is not None else None
+    n_panels = 2 if sim_s is None else 4
+    if figsize is None:
+        figsize = (9.0, 3.2) if n_panels == 2 else (17.0, 3.4)
 
-    fig, axes = plt.subplots(1, 2, figsize=figsize, sharex=True, sharey=True)
-    for ax, pts in zip(axes, (raw_s, proc_s)):
-        if len(pts):
-            sc = ax.scatter(
-                pts[:, 0], pts[:, 1], c=pts[:, 2], s=0.3, cmap="viridis", vmin=vmin, vmax=vmax, rasterized=True
-            )
+    def _scatter(ax, pts, values, cmap, label, vmin, vmax):
+        sc = ax.scatter(pts[:, 0], pts[:, 1], c=values, s=0.3, cmap=cmap, vmin=vmin, vmax=vmax, rasterized=True)
+        fig.colorbar(sc, ax=ax, shrink=0.8, label=label)
+
+    fig, axes = plt.subplots(1, n_panels, figsize=figsize, sharex=True, sharey=True)
+    # Raw z is centred on its mean, processed and simulation share the
+    # simulation frame: the raw panel gets its own colour scale, the others
+    # share one.
+    if len(raw_s):
+        _scatter(axes[0], raw_s, raw_s[:, 2], "viridis", "Z in mm", *np.percentile(raw_s[:, 2], [1, 99]))
+    z_ref = proc_s[:, 2] if len(proc_s) else raw_s[:, 2]
+    vmin, vmax = np.percentile(z_ref, [1, 99]) if len(z_ref) else (0, 1)
+    if len(proc_s):
+        _scatter(axes[1], proc_s, proc_s[:, 2], "viridis", "Z in mm", vmin, vmax)
+    axes[0].set_title(f"(a) Raw, calibrated\n{len(raw_points):,} points")
+    title = f"(b) Processed\n{len(processed_points):,} points"
+    if stats and "outlier_pct" in stats:
+        title += f", {float(stats['outlier_pct']):.1f} % removed"
+    axes[1].set_title(title)
+
+    if sim_s is not None:
+        from scipy.spatial import cKDTree
+
+        _scatter(axes[2], sim_s, sim_s[:, 2], "viridis", "Z in mm", vmin, vmax)
+        sim_title = "(c) Matched simulation"
+        if stats and "simulation_id" in stats:
+            sim_title += f" {int(stats['simulation_id'])}"
+        axes[2].set_title(f"{sim_title}\n{len(sim_points):,} points")
+        distances, _ = (
+            cKDTree(np.asarray(sim_points, dtype=float)).query(proc_s) if len(proc_s) else (np.zeros(0), None)
+        )
+        if len(distances):
+            _scatter(axes[3], proc_s, distances, "magma", "Distance in mm", 0.0, np.percentile(distances, 99))
+        axes[3].set_title(
+            f"(d) Distance to simulation\nmedian {np.median(distances):.2f} mm"
+            if len(distances)
+            else "(d) Distance to simulation"
+        )
+
+    for ax in axes:
         ax.set_aspect("equal")
         ax.set_xlabel("X in mm")
         ax.grid(True, alpha=0.3)
     axes[0].set_ylabel("Y in mm")
-    axes[0].set_title(f"(a) Raw, calibrated ({len(raw_points):,} points)")
-    title = f"(b) Processed ({len(processed_points):,} points)"
-    if stats and "outlier_pct" in stats:
-        title += f", {float(stats['outlier_pct']):.1f} % removed"
-    axes[1].set_title(title)
-    if len(raw_s):
-        fig.colorbar(sc, ax=axes, shrink=0.8, label="Z in mm")
+    fig.tight_layout()
     return fig
 
 
@@ -445,10 +481,27 @@ def main(argv: Sequence[str] | None = None) -> None:
             with h5py.File(path, "r") as f:
                 grp = f[f"pointcloud/{args.op}"]
                 points, stats = grp["z"][:], dict(grp.attrs)
-            fig = plot_pointcloud_processing(z_2d, lumi_2d, points, stats=stats, **cfg["pointcloud"])
+                stats.update(f["pointcloud"].attrs)  # simulation match lives on the parent group
+            sim_points = None
+            if "simulation_id" in stats:
+                from .pointcloud.simulation import SimContext
+
+                sim_ctx = SimContext(args.data_dir)
+                if sim_ctx.available():
+                    sim_points = sim_ctx.points(int(stats["simulation_id"]), args.op)
+                else:
+                    print("simulations not found: drawing raw and processed panels only")
+            fig = plot_pointcloud_processing(
+                z_2d, lumi_2d, points, sim_points=sim_points, stats=stats, **cfg["pointcloud"]
+            )
 
     os.makedirs(args.out, exist_ok=True)
-    suffix = f"_{args.op}" if args.modality in ("luminescence", "pointcloud") else ""
+    suffix = ""
+    if args.modality in ("luminescence", "pointcloud"):
+        from .h5_access import open_raw
+
+        with open_raw(args.id, args.data_dir) as raw:  # one image per group: <geometry>_<op>
+            suffix = f"_{raw.attrs.get('geometry', 'scan')}_{args.op}"
     path = os.path.join(args.out, f"{args.modality}_processing{suffix}.{args.format}")
     fig.savefig(path, format=args.format, dpi=args.dpi, bbox_inches="tight")
     plt.close(fig)

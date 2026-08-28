@@ -115,7 +115,7 @@ rddac preprocess pointcloud --workers 8
 
 Without the simulations the stage is skipped with a notice (or fails with an actionable error when named explicitly). Its first step, the validity mask from the luminescence grid, needs only raw data and can be previewed on the small bundle with `visualize.plot_luminescence_processing(lumi_2d)`:
 
-<img src="../../images/preprocessing/luminescence_processing_op10.png" width="900">
+<img src="../../images/preprocessing/luminescence_processing_concave_op10.png" width="900">
 
 See [Point Clouds](../preprocessing/pointcloud.md) for the full pipeline and the held-out quality numbers.
 

@@ -69,6 +69,9 @@ PC_MAX_CLOSING_ITER = 15
 #: ICP iterations and source subsample size (seeded rng -> reproducible).
 PC_ICP_MAX_ITERATIONS = 50
 PC_ICP_SAMPLE_SIZE = 50000
+#: Cup anchor for the second ICP pass: points higher than the simulation's flange
+#: level plus this margin (mm) count as cup (bottom + walls); the flange is excluded.
+PC_ICP_ANCHOR_HEIGHT_MM = 3.0
 #: RF fin classifier decision threshold on predict_proba (the P/R knob).
 PC_RF_THRESHOLD = 0.5
 #: RF hyperparameters (part of the model-cache fingerprint).

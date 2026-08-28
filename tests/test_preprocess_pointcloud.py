@@ -178,3 +178,25 @@ class TestPacking:
         assert packed.dtype == np.uint8
         assert packed[~valid].max() == 0
         assert packed[valid].min() >= 1 and packed[valid].max() == 255
+
+
+class TestAlignToSimulation:
+    """Two-pass, cup-anchored alignment returns a consistent composed transform."""
+
+    def _cup(self, n=40000, seed=0):
+        rng = np.random.default_rng(seed)
+        xy = rng.uniform(-100, 100, size=(n, 2))
+        r = np.abs(xy).max(axis=1)
+        z = np.where(r < 50, 30.0, np.where(r < 60, 30.0 - 3.0 * (r - 50), 0.0))  # bottom, walls, flange
+        return np.column_stack([xy, z])
+
+    def test_composed_transform_matches_output_and_anchor_excludes_flange(self):
+        sim = self._cup(seed=1)
+        angle = np.radians(1.5)
+        rot = np.array([[np.cos(angle), -np.sin(angle), 0], [np.sin(angle), np.cos(angle), 0], [0, 0, 1]])
+        scan = self._cup(seed=2) @ rot.T + np.array([1.5, -0.8, 4.0])
+        aligned, rotation, translation, stats = geometry.align_to_simulation(scan, sim, n_sample=10000)
+        assert np.allclose(aligned, scan @ rotation.T + translation, atol=1e-6)
+        assert stats["n_anchor_points"] > 0 and stats["n_anchor_points"] < len(scan), "flange excluded"
+        d, _ = cKDTree(sim).query(aligned)
+        assert np.median(d) < 0.5

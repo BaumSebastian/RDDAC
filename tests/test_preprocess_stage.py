@@ -153,6 +153,15 @@ class TestStageEndToEnd:
         stats2 = run(["pointcloud"], data_dir=str(raw), out_dir=str(out), quiet=True, config=cfg)
         assert stats2["pointcloud"] == {"exists": 3}
 
+        # an interrupted --overwrite leaves an empty group: it must be recomputed, not skipped
+        with h5py.File(out / "0001.h5", "a") as f:
+            for op in list(f["pointcloud"]):
+                del f[f"pointcloud/{op}"]
+        stats3 = run(["pointcloud"], data_dir=str(raw), out_dir=str(out), quiet=True, config=cfg)
+        assert stats3["pointcloud"] == {"processed": 1, "exists": 2}
+        with h5py.File(out / "0001.h5", "r") as f:
+            assert sorted(f["pointcloud"]) == ["op10", "op20"]
+
     def test_fin_region_is_removed(self, pc_env):
         raw, out, cfg = pc_env
         run(["pointcloud"], data_dir=str(raw), out_dir=str(out), ids="1", quiet=True, config=cfg)

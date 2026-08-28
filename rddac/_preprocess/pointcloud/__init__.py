@@ -12,7 +12,9 @@ Pipeline per operation (OP10 deep drawing, OP20 cutting):
    monotonicity, small 3D components — plus morphological closing on a kNN
    graph.
 4. Simulation matching (geometry, blankholder force, sheet/oil means of the
-   same run) + ICP alignment to the matched DDACS simulation. Requires the
+   same run) + two-pass ICP alignment to the matched DDACS simulation
+   (all points first, then anchored on the cup so the flange does not bias
+   the pose). Requires the
    simulations from ``rddac download`` (without ``--no-sim``).
 5. RF fin cleaner: registered position-prior + consensus-deviation features;
    retrained deterministically from the bundled labels on first use and

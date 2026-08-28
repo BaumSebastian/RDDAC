@@ -54,6 +54,7 @@ DEFAULTS: dict[str, dict] = {
         "max_closing_iter": d.PC_MAX_CLOSING_ITER,
         "icp_max_iterations": d.PC_ICP_MAX_ITERATIONS,
         "icp_sample_size": d.PC_ICP_SAMPLE_SIZE,
+        "icp_anchor_height_mm": d.PC_ICP_ANCHOR_HEIGHT_MM,
         "rf_threshold": d.PC_RF_THRESHOLD,
         "rf_n_estimators": d.PC_RF_N_ESTIMATORS,
         "rf_max_depth": d.PC_RF_MAX_DEPTH,

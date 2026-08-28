@@ -11,15 +11,20 @@ independently of the package.
 - `rddac preprocess`: reference preprocessing of the raw dataset into an ML-ready
   processed layer (`<data-dir>/processed`, raw files untouched): forming-window
   force curves (`force`), cleaned sheet-thickness and oil-film profiles (`sheet`,
-  `oil`), and calibrated, simulation-aligned point clouds with a random-forest
-  fin classifier (`pointcloud`, needs the `[preprocessing]` extra and the DDACS
-  simulations). Parameters are adjustable via TOML (`--dump-config`/`--config`)
-  and stamped into the output attributes.
+  `oil`), and calibrated point clouds aligned to the matched DDACS simulation
+  with a random-forest fin classifier (`pointcloud`, needs the `[preprocessing]`
+  extra and the DDACS simulations). The alignment is a two-pass ICP anchored on
+  the cup (bottom and walls), so flange springback and draw-in do not bias the
+  pose. Parameters are adjustable via TOML (`--dump-config`/`--config`) and
+  stamped into the output attributes; the run summary reports per modality what
+  was processed, skipped or failed, in plain words.
 - Fin labels (CC BY 4.0), scanner calibration and the simulation parameter table
   ship as package data; the fin classifier is retrained from the labels on first
   use and cached under `<out>/models/pointcloud_fin_rf/`.
 - Processing figures per modality (`rddac._preprocess.visualize`), used in the
-  documentation and in the new tutorial and notebook `07_preprocessing`.
+  documentation and in the new tutorial and notebook `07_preprocessing`; the
+  point-cloud figure shows the raw scan, the processed cloud, the matched
+  simulation and the distance to it.
 - Documentation section *Preprocessing* (overview, one page per modality,
   custom processing) and a CI workflow (pre-commit hooks, tests on 3.10 to 3.12,
   strict docs build).
