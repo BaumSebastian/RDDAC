@@ -5,7 +5,7 @@ All notable changes to the `rddac` package are documented here. The format follo
 `bumpver` tags. The dataset itself is versioned on DaRUS (doi:10.18419/DARUS-5589)
 independently of the package.
 
-## [Unreleased]
+## [1.1.1] - 2026-09-01
 
 ### Changed
 - Pointcloud preprocessing: the y scale is now the packaged constant
@@ -63,7 +63,8 @@ independently of the package.
   PyTorch `RDDACDataset`, plotting helpers, documentation and six tutorial
   notebooks.
 
-[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.1...HEAD
+[1.1.1]: https://github.com/BaumSebastian/RDDAC/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/BaumSebastian/RDDAC/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/BaumSebastian/RDDAC/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/BaumSebastian/RDDAC/releases/tag/1.0.0
