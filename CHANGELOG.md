@@ -7,6 +7,14 @@ independently of the package.
 
 ## [Unreleased]
 
+### Changed
+- Pointcloud preprocessing: the y scale is now the packaged constant
+  `y_mm_per_pixel = 0.1581` (one scanner, one configuration, one line spacing)
+  instead of a per-scan derivation from a square-part assumption, which had let
+  the anisotropic draw-in of the formed blank leak into the calibration
+  (spread 0.1556-0.1614 mm/px). Reprocess point clouds with
+  `rddac preprocess pointcloud --overwrite --rebuild-models` to apply it.
+
 ## [1.1.0] - 2026-08-28
 
 ### Added

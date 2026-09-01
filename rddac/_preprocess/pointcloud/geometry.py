@@ -27,7 +27,7 @@ from scipy.spatial import KDTree, cKDTree
 
 
 def load_calibration() -> dict:
-    """The packaged sensor calibration (``x_mm_per_pixel``, ``z_mm_per_unit``)."""
+    """The packaged sensor calibration (``x_mm_per_pixel``, ``y_mm_per_pixel``, ``z_mm_per_unit``)."""
     path = resources.files("rddac._preprocess") / "calibration.json"
     with path.open() as f:
         return json.load(f)["calibration"]
@@ -76,22 +76,6 @@ def pack_luminescence(lumi_2d: np.ndarray, valid_mask: np.ndarray) -> np.ndarray
     return out
 
 
-def y_calibration(valid_mask: np.ndarray, x_mm_per_pixel: float) -> float:
-    """Per-scan y calibration from the square-part assumption.
-
-    Args:
-        valid_mask: ``(H, W)`` boolean validity mask.
-        x_mm_per_pixel: Known x calibration from the sensor spec.
-
-    Returns:
-        Millimeters per pixel along y.
-    """
-    y_idx, x_idx = np.where(valid_mask)
-    x_span_px = x_idx.max() - x_idx.min()
-    y_span_px = y_idx.max() - y_idx.min()
-    return (x_span_px * x_mm_per_pixel) / y_span_px
-
-
 def extract_points(
     z_2d: np.ndarray,
     valid_mask: np.ndarray,
@@ -108,7 +92,7 @@ def extract_points(
         z_2d: ``(H, W)`` raw z grid (sensor units, 0 = invalid).
         valid_mask: ``(H, W)`` boolean validity mask.
         x_mm_per_pixel: X calibration.
-        y_mm_per_pixel: Y calibration (see :func:`y_calibration`).
+        y_mm_per_pixel: Y calibration (packaged constant, see ``calibration.json``).
         z_mm_per_unit: Z calibration.
 
     Returns:

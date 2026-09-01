@@ -1,12 +1,13 @@
 {
   "calibration": {
     "x_mm_per_pixel": 0.07692307692307693,
-    "z_mm_per_unit": 0.007754506005746317
+    "z_mm_per_unit": 0.007754506005746317,
+    "y_mm_per_pixel": 0.1581
   },
   "method": "median_width_ransac_corners",
   "calibration_notes": {
     "x": "Median width measurement across all rows",
-    "y": "Calculated on the fly from object dimensions (object is square)",
+    "y": "Constant line spacing of the measurement configuration (3200 x 2000 grid, one scanner, one setting). Determined directly at this configuration from the measurement scans: mean of the per-scan estimates, corrected by an independent simulation scale fit (concave 0.15818, convex 0.15796; adopted 0.1581). Up to package version 1.1.0 the y scale was derived per scan from a square-part assumption, which let the anisotropic draw-in leak into the calibration (spread 0.1556-0.1614).",
     "z": "Mean of 4 corner height differences (RANSAC surfaces)"
   },
   "block_physical_mm": {

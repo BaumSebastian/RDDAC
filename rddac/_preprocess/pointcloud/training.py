@@ -101,7 +101,7 @@ def prepare_task(
 
     calib = geometry.load_calibration()
     valid = geometry.lumi_valid_mask(lumi_2d, cfg.get("lumi_min_patch_size", d.PC_LUMI_MIN_PATCH_SIZE)) & (z_2d > 0)
-    y_mm_per_px = geometry.y_calibration(valid, calib["x_mm_per_pixel"])
+    y_mm_per_px = calib["y_mm_per_pixel"]  # constant line spacing of the scanner
     points = geometry.extract_points(z_2d, valid, calib["x_mm_per_pixel"], y_mm_per_px, calib["z_mm_per_unit"])
     aligned, _, _, _ = geometry.align_to_simulation(
         points,

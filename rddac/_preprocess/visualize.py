@@ -321,7 +321,7 @@ def plot_pointcloud_processing(
     valid = geometry.lumi_valid_mask(lumi_2d, min_patch) & (z_2d > 0)
     if not valid.any():
         raise ValueError("no valid pixels in the raw scan (check lumi_min_patch_size)")
-    y_mm_per_px = geometry.y_calibration(valid, calib["x_mm_per_pixel"])
+    y_mm_per_px = calib["y_mm_per_pixel"]  # constant line spacing of the scanner
     raw_points = geometry.extract_points(z_2d, valid, calib["x_mm_per_pixel"], y_mm_per_px, calib["z_mm_per_unit"])
     processed_points = np.asarray(processed_points, dtype=float)
 
