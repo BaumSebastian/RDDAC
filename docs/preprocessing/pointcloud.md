@@ -44,6 +44,28 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 
 *Experiments 0 (concave) and 4500 (convex), both part of the small bundle and processed with the simulations present, in top view, OP10 (deep drawing) and OP20 (cutting) each: (a) the raw calibrated scan after the validity mask, (b) the processed, ICP-aligned point cloud (gaps are the removed fins and outliers), (c) the matched DDACS simulation in the same frame, and (d) the processed points coloured by their nearest-neighbour distance to the simulation, the same `kd` sim-distance feature the fin classifier uses.*
 
+## Calibration constants
+
+The raw scans are in scanner units. The stage converts them with two constants that ship as package data (`rddac/_preprocess/calibration.json`, read via `rddac._preprocess.pointcloud.geometry.load_calibration()`); anyone replacing the stage needs the same two numbers:
+
+| Constant | Value | Origin |
+| --- | --- | --- |
+| `x_mm_per_pixel` | 0.0769 mm (1/13) | scanner specification, median width measurement across all rows of the calibration block |
+| `y_mm_per_pixel` | 0.1581 mm | line spacing of the measurement configuration (3200 x 2000), determined directly from the measurement scans: mean of the per-scan estimates, corrected by an independent simulation scale fit |
+| `z_mm_per_unit` | 0.007755 mm | calibration block of 1.0 mm height: mean of the four corner height differences (RANSAC-fitted surfaces) |
+
+All three scales are stamped into the processed `pointcloud/{op}` attributes. Up to package version 1.1.0 the y scale was *derived per scan* from a square-part assumption; the spread this produced (0.1556 to 0.1614 mm/px) was the anisotropic draw-in of the formed blank leaking into the calibration, not the scanner -- one scanner with one configuration has one line spacing.
+
+<img src="../../images/preprocessing/pointcloud_calibration_block.png" width="700">
+
+*The calibration scan: the magnetic gripper with the 30 x 9 x 1 mm calibration block, and the block with its measured edges. Note that this scan was recorded at the same scan speed but with a different number of points (3200 x 1600 instead of the 3200 x 2000 of the measurement scans), so its y spacing (30 mm / 151 px = 0.199 mm/px) belongs to that scan only and is **not** used for the measurements; `y_mm_per_pixel` in the table is determined directly at the measurement configuration.*
+
+<img src="../../images/preprocessing/pointcloud_calibration_result.png" width="700">
+
+*The calibration applied to experiment 0 (OP10): (a) the raw sensor grid, (b) the calibrated cloud in mm with everything below the flange level removed, (c) the fully processed cloud -- **after outlier and fin removal** -- on its matched DDACS simulation (182208), and (d) the same cloud coloured by the distance to it. The gaps in (c) and (d) are the removed fins and outliers.*
+
+Beyond validating the calibration, these views carry process information directly: in (c) the scanned flange contour deviates from the simulated one differently on each side -- the material flow into the die is not symmetric -- and (d) localizes where the real part springs back from the simulated shape (walls and radii) while the cup bottom stays within a few tenths of a millimetre.
+
 ## The classifier is retrained on your machine
 
 Trained models are derived artifacts and are **not distributed**. The bundled labels are annotations of the dataset and, unlike the code, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); attribute the RDDAC dataset when you reuse them. On first use the stage retrains them deterministically (seed 42) from the labels bundled with the package: human-labeled outlier masks for 140 (experiment, operation) tasks, and caches them under `<out>/models/pointcloud_fin_rf/` (the processed output directory, never the raw one) stamped with the scikit-learn version and the label fingerprint. The one-time cost is roughly 30–90 minutes; `--rebuild-models` forces a retrain. Held-out 5-fold cross-validation of the resulting cleaner:
