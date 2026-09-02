@@ -55,5 +55,8 @@ fi
 # 2. Bundle-level readme (HF's upload overwrites this with the dataset card).
 cp "$PUB/teaser/README.md" "$STAGE/README.md"
 
+# 3. Platform descriptions are generated from this README (single source).
+python3 "$PUB/build_descriptions.py"
+
 echo "Staged teaser at $STAGE"
 du -sh "$STAGE"

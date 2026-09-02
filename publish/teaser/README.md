@@ -6,7 +6,9 @@
 
 *Measured point clouds of one experiment after deep drawing (OP10, left) and cutting (OP20, right), colored by the deviation from the matching DDACS simulation.*
 
+<!-- desc:intro:start -->
 **A large-scale experimental dataset of 9,000 physical deep-drawing and cutting experiments — the real-world counterpart to the [DDACS](https://ddacs.readthedocs.io) FEM simulations.** Each experiment forms a modified quadratic cup from DP600 dual-phase steel (deep drawing in OP10, cutting in OP20) and records press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans of the part after each operation. Use it to quantify the simulation-to-reality gap, train models on real process data, or validate DDACS-trained surrogates against physical measurements.
+<!-- desc:intro:end -->
 
 |  |  |
 |---|---|
@@ -22,9 +24,11 @@
 
 ## About this sample
 
+<!-- desc:sample:start -->
 This is a **~174 MB teaser** of RDDAC — 18 experiments (one per category) plus the
 Croissant 1.1 manifest, the complete process-parameter table, and the dataset documentation — so you can explore the schema and run every tutorial in seconds before
 committing to the full download.
+<!-- desc:sample:end -->
 
 ```
 data/

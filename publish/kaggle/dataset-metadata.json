@@ -2,8 +2,12 @@
   "title": "RDDAC Teaser",
   "id": "baumsebastian/rddac-teaser",
   "subtitle": "Real Deep Drawing and Cutting (RDDAC) Dataset",
-  "description": "A ~174 MB sample of the RDDAC dataset: 18 physical deep-drawing and cutting experiments (one per parameter category) with press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans, plus the Croissant 1.1 manifest, the process parameter table for all 9,000 experiments, and the dataset documentation PDF.\n\nRDDAC is the experimental counterpart to the DDACS simulation dataset (https://doi.org/10.18419/DARUS-4801): same cup geometry, same DP600 steel, same two-stage process — use it to quantify the simulation-to-reality gap or train models on real process data.\n\nThe full release (9,000 experiments, roughly 87 GB of lossless HDF5, with a predefined 7,200 / 900 / 900 train, validation and test split) is hosted on DaRUS with a citable DOI: https://doi.org/10.18419/DARUS-5589\n\nQuickstart:\n\n    pip install rddac\n    import rddac\n    with rddac.open_h5(0, data_dir='data') as f:\n        force = f['force/data'][:]\n\nRunnable tutorials are in the Code tab. Docs: https://rddac.readthedocs.io  Package: https://pypi.org/project/rddac  Source: https://github.com/BaumSebastian/RDDAC\n\nLicense: data CC BY 4.0, code MIT. Please cite the dataset DOI and the paper (10.1007/s12666-026-03870-5).",
-  "licenses": [{ "name": "CC-BY-4.0" }],
+  "description": "This is a ~174 MB teaser of RDDAC — 18 experiments (one per category) plus the Croissant 1.1 manifest, the complete process-parameter table, and the dataset documentation — so you can explore the schema and run every tutorial in seconds before committing to the full download.\n\nA large-scale experimental dataset of 9,000 physical deep-drawing and cutting experiments — the real-world counterpart to the DDACS (https://ddacs.readthedocs.io) FEM simulations. Each experiment forms a modified quadratic cup from DP600 dual-phase steel (deep drawing in OP10, cutting in OP20) and records press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans of the part after each operation. Use it to quantify the simulation-to-reality gap, train models on real process data, or validate DDACS-trained surrogates against physical measurements.\n\nThe full release (9,000 experiments, ~87 GB of lossless HDF5, predefined 7,200/900/900 train/val/test split) is hosted on DaRUS with a citable DOI: doi:10.18419/DARUS-5589 (https://doi.org/10.18419/DARUS-5589).\n\nQuickstart: pip install rddac - Docs: rddac.readthedocs.io (https://rddac.readthedocs.io) - Source: github.com/BaumSebastian/RDDAC (https://github.com/BaumSebastian/RDDAC)\n\nLicense: data CC BY 4.0, package code MIT. Please cite the dataset DOI and the paper (10.1007/s12666-026-03870-5).",
+  "licenses": [
+    {
+      "name": "CC-BY-4.0"
+    }
+  ],
   "keywords": [
     "engineering",
     "manufacturing",
@@ -31,16 +35,56 @@
       "description": "The process parameters plus split metadata for all 9,000 experiments.",
       "schema": {
         "fields": [
-          { "name": "index", "type": "integer", "description": "Unique experiment identifier; matches the HDF5 filename (e.g. index=42 -> 0042.h5)." },
-          { "name": "geometry", "type": "string", "description": "Base part geometry: concave or convex." },
-          { "name": "blankholder_force", "type": "integer", "description": "Blank holder force applied during deep drawing, in kN. One of 100, 300, 500." },
-          { "name": "oil_type", "type": "string", "description": "Lubrication pattern applied to the blank: coarse, medium, or fine." },
-          { "name": "experiment_id", "type": "integer", "description": "Repetition index (1..500) within one geometry x blankholder_force x oil_type category." },
-          { "name": "mean_punch_temp", "type": "number", "description": "Mean punch temperature recorded during the experiment, in degC." },
-          { "name": "category", "type": "integer", "description": "Categorical index 0..17 encoding the geometry x blankholder_force x oil_type combination." },
-          { "name": "has_pointcloud", "type": "boolean", "description": "True if OP10/OP20 3D point-cloud scans are available for this experiment." },
-          { "name": "has_oil", "type": "boolean", "description": "True if the blank was lubricated (oil applied) for this experiment." },
-          { "name": "split", "type": "string", "description": "Recommended ML split: train (~80%), val (~10%), test (~10%); deterministic, seed 42." }
+          {
+            "name": "index",
+            "type": "integer",
+            "description": "Unique experiment identifier; matches the HDF5 filename (e.g. index=42 -> 0042.h5)."
+          },
+          {
+            "name": "geometry",
+            "type": "string",
+            "description": "Base part geometry: concave or convex."
+          },
+          {
+            "name": "blankholder_force",
+            "type": "integer",
+            "description": "Blank holder force applied during deep drawing, in kN. One of 100, 300, 500."
+          },
+          {
+            "name": "oil_type",
+            "type": "string",
+            "description": "Lubrication pattern applied to the blank: coarse, medium, or fine."
+          },
+          {
+            "name": "experiment_id",
+            "type": "integer",
+            "description": "Repetition index (1..500) within one geometry x blankholder_force x oil_type category."
+          },
+          {
+            "name": "mean_punch_temp",
+            "type": "number",
+            "description": "Mean punch temperature recorded during the experiment, in degC."
+          },
+          {
+            "name": "category",
+            "type": "integer",
+            "description": "Categorical index 0..17 encoding the geometry x blankholder_force x oil_type combination."
+          },
+          {
+            "name": "has_pointcloud",
+            "type": "boolean",
+            "description": "True if OP10/OP20 3D point-cloud scans are available for this experiment."
+          },
+          {
+            "name": "has_oil",
+            "type": "boolean",
+            "description": "True if the blank was lubricated (oil applied) for this experiment."
+          },
+          {
+            "name": "split",
+            "type": "string",
+            "description": "Recommended ML split: train (~80%), val (~10%), test (~10%); deterministic, seed 42."
+          }
         ]
       }
     }
