@@ -23,7 +23,7 @@ Note: prefer ``rddac.streaming.iter_view`` (or ``RDDACDataset``) over
 walks the full multi-GB zips per view and is impractically slow there.
 """
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 from . import streaming
 from .croissant import add_view, load
