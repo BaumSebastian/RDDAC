@@ -35,7 +35,7 @@ The two `geometry` values split the id range in half: `concave` covers 0000-4499
 
 <img src="../images/agg_oil_heatmap.png" width="700">
 
-*Oil film measurements aggregated over all parts of one category — repetitions of the same nominal parameters, overlaid.*
+*Oil film measurements aggregated over all parts of one category, repetitions of the same nominal parameters, overlaid.*
 
 ## Split
 
@@ -43,7 +43,7 @@ The `split` column carries the recommended `train` / `val` / `test` partition: 8
 
 ## Missing-measurement flags
 
-`has_pointcloud` and `has_oil` flag whether the `pointcloud/` and `oil_thickness/` HDF5 groups exist for the experiment ({{ missing_pointcloud() }} and {{ missing_oil() }} experiments are missing them, respectively — see [Dataset overview](dataset.md#missing-measurements)). Views that read those groups must filter on the flags, otherwise the read raises a `KeyError` for the affected experiments.
+`has_pointcloud` and `has_oil` flag whether the `pointcloud/` and `oil_thickness/` HDF5 groups exist for the experiment ({{ missing_pointcloud() }} and {{ missing_oil() }} experiments are missing them, respectively; see [Dataset overview](dataset.md#missing-measurements)). Views that read those groups must filter on the flags, otherwise the read raises a `KeyError` for the affected experiments.
 
 ## Sample
 

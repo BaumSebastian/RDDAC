@@ -4,7 +4,7 @@
 
 - `iter_view` walks a Croissant view record by record. Shares a unified index that recognises loose `.h5` files (`rddac download --extract --remove-zip`) and zipped `*.zip` archives interchangeably.
 - `export_to_numpy` materialises a view as flat `.npy` memmap shards, with optional per-field and whole-record transforms. Requires every record to share the same shape per field.
-- `export_to_numpy_per_sim` writes one `.npz` per experiment instead — the escape hatch for views whose raw fields have per-experiment sample counts.
+- `export_to_numpy_per_sim` writes one `.npz` per experiment instead, the escape hatch for views whose raw fields have per-experiment sample counts.
 - `load_export` opens the memmap shards back as a `len + getitem + iter` protocol object that plugs into `torch.utils.data.DataLoader`, `tf.data.Dataset.from_generator`, JAX, or plain Python without any adapter.
 
 ## `rddac.streaming.iter_view`

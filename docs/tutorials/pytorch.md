@@ -58,8 +58,8 @@ Output:
 force_data   shape=(1, 1140, 8) dtype=torch.float32
 ```
 
-!!! warning "Raw records have variable shapes — mind the batch size"
-    The sample count `n` of the force and traverse tables **varies per experiment** (raw data as recorded). The default `collate_fn` can only stack tensors of identical shape, so `batch_size > 1` fails on `force-curve` and `thickness` unless you pass a custom `collate_fn` that pads, truncates or resamples to a common length (see [Custom collate](#custom-collate)). The two pointcloud views are fixed-shape — every scan buffer is `(6400000,)` — and batch without extra work, at ~25 MB per field per record.
+!!! warning "Raw records have variable shapes, mind the batch size"
+    The sample count `n` of the force and traverse tables **varies per experiment** (raw data as recorded). The default `collate_fn` can only stack tensors of identical shape, so `batch_size > 1` fails on `force-curve` and `thickness` unless you pass a custom `collate_fn` that pads, truncates or resamples to a common length (see [Custom collate](#custom-collate)). The two pointcloud views are fixed-shape, every scan buffer is `(6400000,)`, and batch without extra work, at ~25 MB per field per record.
 
 ## 3. Filter via the Croissant manifest
 
@@ -239,7 +239,7 @@ field specs:     {'force': ('force/data', None)}
 total sim_ids:   9000
 ```
 
-Same flow with `where=`, `sim_ids=`, and `shuffle=` works against `custom_ds` — the custom view is just another `RecordSet` once it lives on `ds_manifest`.
+Same flow with `where=`, `sim_ids=`, and `shuffle=` works against `custom_ds`; the custom view is just another `RecordSet` once it lives on `ds_manifest`.
 
 If you do not need a `DataLoader` or PyTorch at all, `rddac.streaming.iter_view(view='force-only', data_dir=DATA_DIR, dataset=ds_manifest)` is the no-torch equivalent that yields the same records one at a time. The [Streaming and numpy export](streaming.md) tutorial covers it and shows the matching `streaming.export_to_numpy` recipe for materialising a view as flat `.npy` shards.
 

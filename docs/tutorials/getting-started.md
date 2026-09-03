@@ -39,7 +39,7 @@ Output:
 
 ## 2. Download the data
 
-This tutorial only needs the small bundle ({{ small_download_size() }}) — `metadata.json`, `process_parameters.csv` and `sample.zip` with one experiment per category:
+This tutorial only needs the small bundle ({{ small_download_size() }}), `metadata.json`, `process_parameters.csv` and `sample.zip` with one experiment per category:
 
 ```bash
 rddac download --small
@@ -105,12 +105,12 @@ Each line that starts with `@` is an HDF5 attribute. Groups end in `/`; datasets
 
 ## 4. First plot
 
-The next cell renders the OP10 laser scan — the formed cup after deep drawing — as a 3D point cloud. Two buffers drive the plot:
+The next cell renders the OP10 laser scan, the formed cup after deep drawing, as a 3D point cloud. Two buffers drive the plot:
 
 - **`z`** : the raw height buffer. `pointcloud/op10/z` is a flat `(6400000,)` array stored row-major over the 2000 x 3200 pixel grid declared by the group's `y_shape` / `x_shape` attributes.
 - **`luminescence`** : the matching intensity buffer. Pixels where the scanner measured nothing carry `0`; passing the buffer to `scan_to_pointcloud` drops them, so only real measurements become points.
 
-`rddac.scan_to_pointcloud` turns the buffers into an `(N, 3)` array of `[x_px, y_px, z_raw]`; `stride=4` keeps every fourth pixel in both axes (~400k points instead of 6.4 million — plenty for a preview). The values are raw sensor units (uncalibrated) — good enough for inspection; the mm calibration belongs to the optional [preprocessing](../preprocessing/pointcloud.md) step (`rddac preprocess pointcloud`).
+`rddac.scan_to_pointcloud` turns the buffers into an `(N, 3)` array of `[x_px, y_px, z_raw]`; `stride=4` keeps every fourth pixel in both axes (~400k points instead of 6.4 million, plenty for a preview). The values are raw sensor units (uncalibrated), good enough for inspection; the mm calibration belongs to the optional [preprocessing](../preprocessing/pointcloud.md) step (`rddac preprocess pointcloud`).
 
 ```python
 import matplotlib.pyplot as plt

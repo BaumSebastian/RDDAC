@@ -16,7 +16,7 @@ The Croissant manifest is the single source of truth for what is in RDDAC and wh
 
 - **Distribution**: every file on DaRUS plus a FileSet for the HDF5 contents inside the zips.
 - **`process-parameters`**: rows of `process_parameters.csv` with descriptions and types.
-- **`field-map`**: every HDF5 dataset (path, shape, units) declared once — {{ field_map_summary() }}.
+- **`field-map`**: every HDF5 dataset (path, shape, units) declared once, {{ field_map_summary() }}.
 - **Use case RecordSets**: {{ use_case_record_sets() }}.
 
 !!! warning "The `thickness` view reads the oil group"

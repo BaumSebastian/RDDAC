@@ -67,7 +67,7 @@ After `--extract --remove-zip`, the HDF5 files are no longer wrapped in zips and
 
 ## `rddac preprocess`
 
-Process raw measurements into the ML-ready processed layout — see [Preprocessing](preprocessing/index.md) for what each modality does. Raw files are never modified; processed files are written separately.
+Process raw measurements into the ML-ready processed layout; see [Preprocessing](preprocessing/index.md) for what each modality does. Raw files are never modified; processed files are written separately.
 
 ```bash
 rddac preprocess [MODALITY ...] [OPTIONS]

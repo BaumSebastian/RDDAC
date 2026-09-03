@@ -63,7 +63,7 @@ Output (with the small bundle on disk):
   _sim_id            = 0
 ```
 
-`_sim_id` is a private scratch key carrying the experiment id — handy inside transforms (e.g. per-experiment RNG seeding); `export_to_numpy` strips it before writing shards.
+`_sim_id` is a private scratch key carrying the experiment id, handy inside transforms (e.g. per-experiment RNG seeding); `export_to_numpy` strips it before writing shards.
 
 Replace `sim_ids=[0]` with `where=lambda row: row['split'] == 'train'` or simply omit both arguments to walk every experiment in `process_parameters.csv`. Remember the availability flags for views that touch the oil or pointcloud groups: `where=lambda row: row['has_oil']` (see [Missing measurements](../dataset.md#missing-measurements)).
 
@@ -73,11 +73,11 @@ The same function transparently handles both layouts: zipped (the default) and l
 
 `export_to_numpy` walks the view once, applies any per-field or whole-record transforms, and writes each output alias into its own pre-allocated `.npy` memmap of shape `(n_experiments, *field_shape)`. It also writes `sim_ids.npy` so the row order is recoverable.
 
-That pre-allocation implies a contract: **every record must produce the same shape per alias** — but the raw RDDAC force table is `(n, 8)` with `n` varying per experiment. The `record_transform` below fixes that and is a good template for the way training pipelines actually consume the dataset:
+That pre-allocation implies a contract: **every record must produce the same shape per alias**, but the raw RDDAC force table is `(n, 8)` with `n` varying per experiment. The `record_transform` below fixes that and is a good template for the way training pipelines actually consume the dataset:
 
 1. **Resample to a fixed length.** Linear interpolation onto 1,000 uniformly spaced points per channel gives every record the same `(1000, 8)` shape.
 2. **Derive training targets.** The scalar `max_total_force` is precomputed at export time instead of being recomputed every epoch.
-3. **Carry conditions and labels along.** The blankholder force rides next to the tensors, and the categorical geometry becomes a small-int label — anything that fits in a numpy array can ride alongside the main fields, declared by the `record_transform`. No separate metadata file required.
+3. **Carry conditions and labels along.** The blankholder force rides next to the tensors, and the categorical geometry becomes a small-int label; anything that fits in a numpy array can ride alongside the main fields, declared by the `record_transform`. No separate metadata file required.
 
 `transforms={alias: fn}` would do the same on a single field; `record_transform` is the right tool when the output keys do not match the input keys, as here.
 
@@ -125,7 +125,7 @@ Output:
 
 ## 4. Read the shards back with `load_export`
 
-`rddac.streaming.load_export(directory)` opens the exported folder behind the standard Python data model (`__len__`, `__getitem__`, `__iter__`, plus `by_sim_id`). Each row is a plain `dict[str, np.ndarray]`. Reads are sub-millisecond after the first access and the full release fits even when it doesn't fit in RAM — only the rows you actually access are loaded from disk.
+`rddac.streaming.load_export(directory)` opens the exported folder behind the standard Python data model (`__len__`, `__getitem__`, `__iter__`, plus `by_sim_id`). Each row is a plain `dict[str, np.ndarray]`. Reads are sub-millisecond after the first access and the full release fits even when it doesn't fit in RAM, since only the rows you actually access are loaded from disk.
 
 ??? note "Why it is fast: memory-mapped reads in one paragraph (skip if not interested)"
     The shards are opened with `mmap_mode='r'`, which maps each `.npy` file directly into the process's virtual address space. Accessing `arr[i]` becomes an ordinary memory read; the operating system fetches whatever page that lives on from disk on demand and keeps a copy in its page cache. No pickle, no buffer allocation, no copy on the read path. The same page cache is shared across processes, so a `DataLoader(num_workers=N)` does not multiply the cached data by `N`. Cold reads pay the disk seek + page fault; warm reads are RAM-fast.
@@ -170,7 +170,7 @@ Output:
 max total force = 365.7 kN
 ```
 
-For a PyTorch training loop, pass the same `export` straight into a `DataLoader` — the map-style `Dataset` protocol is just `len + getitem`, which this object provides natively:
+For a PyTorch training loop, pass the same `export` straight into a `DataLoader`; the map-style `Dataset` protocol is just `len + getitem`, which this object provides natively:
 
 ```python
 from torch.utils.data import DataLoader
@@ -207,11 +207,11 @@ iter_view   : 18 experiments in 282.59 ms  (15.70 ms/exp)
 load_export : 18 experiments in 0.08 ms  (0.004 ms/exp)
 ```
 
-Three orders of magnitude faster per record after a one-time export, and the numerical results match exactly (the target was precomputed by the same code path). On the full release the gap widens further: the per-record `iter_view` cost includes gzip decompression of every field the view touches — for the pointcloud views that is ~25 MB per buffer per experiment.
+Three orders of magnitude faster per record after a one-time export, and the numerical results match exactly (the target was precomputed by the same code path). On the full release the gap widens further: the per-record `iter_view` cost includes gzip decompression of every field the view touches, for the pointcloud views that is ~25 MB per buffer per experiment.
 
 ## 6. When records have variable shapes (`export_to_numpy_per_sim`)
 
-`export_to_numpy` pre-allocates one memmap per alias, sized from record 0 as `(n_experiments, *field_shape)`. Every subsequent record must produce the exact same shape per alias; a shape mismatch raises a `ValueError` pointing here. The constraint is the right contract once a transform pinned the shapes — like the resampling above, or the fixed `(6400000,)` scan buffers. It is **not** the right contract for exports that keep the raw, per-experiment sample counts.
+`export_to_numpy` pre-allocates one memmap per alias, sized from record 0 as `(n_experiments, *field_shape)`. Every subsequent record must produce the exact same shape per alias; a shape mismatch raises a `ValueError` pointing here. The constraint is the right contract once a transform pinned the shapes, like the resampling above, or the fixed `(6400000,)` scan buffers. It is **not** the right contract for exports that keep the raw, per-experiment sample counts.
 
 For those cases, use `rddac.streaming.export_to_numpy_per_sim`. Same iteration pipeline (`iter_view` + per-field `transforms` + whole-record `record_transform`), same `_sim_id` enrichment, but the writer is one `np.savez(<experiment_id>.npz)` per record instead of one memmap per alias. Each `.npz` carries all the aliases for one experiment; consumers reload via `np.load(path)` and access by key.
 
@@ -231,10 +231,10 @@ Trade-offs vs `export_to_numpy`:
 - **No fixed-shape constraint.** Variable-`n` tables and ragged tensors are fine.
 - **One file per experiment.** Random access by id is just `np.load(out_dir / f"{experiment_id}.npz")`.
 
-When the data permits, prefer fixing the shape (resample the signals, keep the scan buffers whole, or crop/pad to a common size) and using `export_to_numpy` — the mmap path is faster. If nothing fits, `export_to_numpy_per_sim` is the honest answer.
+When the data permits, prefer fixing the shape (resample the signals, keep the scan buffers whole, or crop/pad to a common size) and using `export_to_numpy`; the mmap path is faster. If nothing fits, `export_to_numpy_per_sim` is the honest answer.
 
 ## Where to go next
 
 - The same `transforms` / `record_transform` pattern is exactly how you turn a categorical column into a small-int label: `transforms={'oil_type': lambda v: {'coarse': 0, 'medium': 1, 'fine': 2}[v]}`.
-- `streaming.iter_view` is independent of the storage layout: it transparently reads loose `.h5` files (after `rddac download --extract --remove-zip`) and zipped archives. Loose files take precedence when both exist — see the [Loose HDF5 recipe](loose-h5.md).
+- `streaming.iter_view` is independent of the storage layout: it transparently reads loose `.h5` files (after `rddac download --extract --remove-zip`) and zipped archives. Loose files take precedence when both exist; see the [Loose HDF5 recipe](loose-h5.md).
 - For batched, sharded training there is [`RDDACDataset`](pytorch.md) (PyTorch), which uses the same view-driven mechanics and benefits from the same `add_view` mutations via its `dataset=` kwarg.

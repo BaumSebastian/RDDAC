@@ -54,9 +54,9 @@ Field IDs (such as `force_data`) come from the field-map RecordSet declared in t
 | `("field_id", None)` | whole field-map field (explicit) | same as above |
 | `("field_id", int)` | one index along axis 0 (field-map only) | one axis dropped |
 | `("field_id", [int, int, ...])` | subset along axis 0 (field-map only) | subset along axis 0 |
-| `"<record-set>/<field>"` | qualified id, pulls from any RecordSet (e.g. `"process-parameters/blankholder_force"`) | depends on the source — scalars for CSV columns, full arrays for field-map fields |
+| `"<record-set>/<field>"` | qualified id, pulls from any RecordSet (e.g. `"process-parameters/blankholder_force"`) | depends on the source, scalars for CSV columns, full arrays for field-map fields |
 
-The `(field_id, slicing)` tuple form is kept for one-to-one DDACS compatibility, where it selects simulation timesteps. RDDAC's raw fields have no timestep axis and their leading dimension `n` varies per experiment, so slicing is rarely useful here — the bare-string form covers almost every RDDAC view.
+The `(field_id, slicing)` tuple form is kept for one-to-one DDACS compatibility, where it selects simulation timesteps. RDDAC's raw fields have no timestep axis and their leading dimension `n` varies per experiment, so slicing is rarely useful here; the bare-string form covers almost every RDDAC view.
 
 ## Mix in process-parameters columns
 
@@ -121,7 +121,7 @@ my-view/op10_z  <- field-map/pointcloud_op10_z       transforms=[]
 
 ## 4. Iterate records
 
-Each record is a dict keyed by the aliases declared in `add_view`. The canonical iteration path is `rddac.streaming.iter_view` (or `RDDACDataset` for training) — **not** `ds.records()`:
+Each record is a dict keyed by the aliases declared in `add_view`. The canonical iteration path is `rddac.streaming.iter_view` (or `RDDACDataset` for training), **not** `ds.records()`:
 
 !!! warning "`ds.records()` does not scale to a partial download"
     `mlcroissant` walks every zip referenced by the FileSet at iterator setup, before yielding the first record. With the **small bundle** only `sample.zip` is on disk, so `ds.records("my-view")` raises a `GenerationError` on the first missing geometry zip. With the **full release** it works but pays the full FileSet setup walk first.

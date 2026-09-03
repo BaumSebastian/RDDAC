@@ -35,7 +35,7 @@ plt.show()
 
 <img src="../../images/example_scan_op10.png" width="700">
 
-The OP20 scan shows the same part after cutting — the flange is gone:
+The OP20 scan shows the same part after cutting, the flange is gone:
 
 ```python
 ax, cbar = rddac.plot_scan(z20, title='OP20 - after cutting')
@@ -60,7 +60,7 @@ plt.show()
 
 ## 3. From scan to point cloud
 
-`scan_to_pointcloud` converts a flat buffer into an `(N, 3)` array of `[x_px, y_px, z_raw]`, dropping invalid pixels. Passing the luminescence buffer as the second argument additionally drops pixels where the intensity is zero (no reliable measurement). `stride` thins the grid for fast previews — `stride=4` reduces the 6.4 M pixels to roughly 400 k points:
+`scan_to_pointcloud` converts a flat buffer into an `(N, 3)` array of `[x_px, y_px, z_raw]`, dropping invalid pixels. Passing the luminescence buffer as the second argument additionally drops pixels where the intensity is zero (no reliable measurement). `stride` thins the grid for fast previews, `stride=4` reduces the 6.4 M pixels to roughly 400 k points:
 
 ```python
 with rddac.open_h5(experiment_id, data_dir=DATA_DIR) as f:
@@ -86,11 +86,11 @@ plt.show()
 
 <img src="../../images/example_point_cloud.png" width="700">
 
-The signature mirrors `ddacs.plot_point_cloud`, so DDACS rendering code ports by swapping the import. `values=` accepts any per-point scalar — pass the luminescence of the surviving points to paint intensity onto the geometry.
+The signature mirrors `ddacs.plot_point_cloud`, so DDACS rendering code ports by swapping the import. `values=` accepts any per-point scalar, pass the luminescence of the surviving points to paint intensity onto the geometry.
 
 ## 4. Force signals
 
-`force/data` is an `(n, 8)` table; the column layout lives in the group's `columns` attr and matches `rddac.visualization.FORCE_COLUMNS`. `plot_force` draws the selected signals against time — by default the four load cells and the total force:
+`force/data` is an `(n, 8)` table; the column layout lives in the group's `columns` attr and matches `rddac.visualization.FORCE_COLUMNS`. `plot_force` draws the selected signals against time, by default the four load cells and the total force:
 
 ```python
 with rddac.open_h5(experiment_id, data_dir=DATA_DIR) as f:
@@ -106,7 +106,7 @@ Pass `signals=('punch_pos',)` (or any subset of the column names) to plot other 
 
 ## 5. Sensor traverses
 
-`plot_traverse` renders the two `(n, 2)` traverse tables — sheet thickness and oil film — as value over sensor position:
+`plot_traverse` renders the two `(n, 2)` traverse tables, sheet thickness and oil film, as value over sensor position:
 
 ```python
 with rddac.open_h5(experiment_id, data_dir=DATA_DIR) as f:
@@ -129,7 +129,7 @@ if oil is not None:
 
 <img src="../../images/example_oil.png" width="700">
 
-The `label=` argument plus a shared `ax` overlays multiple traverses — useful for comparing repetitions of one category:
+The `label=` argument plus a shared `ax` overlays multiple traverses, useful for comparing repetitions of one category:
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 4))

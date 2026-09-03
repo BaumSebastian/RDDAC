@@ -27,7 +27,7 @@ Three process parameters are varied on a full grid; every combination is a **cat
 
 <img src="../images/agg_force_by_bhf.png" width="700">
 
-*Total press force over time (concave geometry, mean of 25 experiments per combination) — color encodes the blankholder force, line style the oil type.*
+*Total press force over time (concave geometry, mean of 25 experiments per combination), color encodes the blankholder force, line style the oil type.*
 
 ## Operations
 
@@ -37,7 +37,7 @@ Each experiment runs two operations end to end. OP10 is the deep drawing step: t
 
 Four raw modalities are recorded per experiment (see [HDF5 structure](hdf5-structure.md) for exact shapes and units). The single-experiment figures below all show experiment `0000`; the traverse heatmaps show category 2 (concave, 100 kN, fine oil).
 
-**Press force signals** — four load cells positioned around the forming die sample the force at 300 Hz while the punch descends in OP10. The same table carries the punch temperature, the punch position, and the summed total force, so one figure shows the complete press state over the stroke:
+**Press force signals**: four load cells positioned around the forming die sample the force at 300 Hz while the punch descends in OP10. The same table carries the punch temperature, the punch position, and the summed total force, so one figure shows the complete press state over the stroke:
 
 <img src="../images/example_force.png" width="700">
 
@@ -47,15 +47,15 @@ Across repetitions the force signals also expose slow process drift, such as the
 
 <img src="../images/agg_punch_temp.png" width="700">
 
-*Punch temperature over repetitions, one panel per geometry — color encodes the blankholder force, line style the oil type.*
+*Punch temperature over repetitions, one panel per geometry, color encodes the blankholder force, line style the oil type.*
 
-Before forming, two line measurements are taken on the flat blank — the sheet thickness on the bare blank, the oil film after the lubricant is applied:
+Before forming, two line measurements are taken on the flat blank, the sheet thickness on the bare blank, the oil film after the lubricant is applied:
 
 <img src="../images/scheme_measurement_lines.png" width="700">
 
 *One measurement line per part on the flat blank: sheet thickness before lubrication, oil film after.*
 
-**Sheet thickness traverse** — a thickness sensor traverses the blank along that line and records the material thickness in µm, capturing the manufacturing tolerances of the sheet metal coil.
+**Sheet thickness traverse**: a thickness sensor traverses the blank along that line and records the material thickness in µm, capturing the manufacturing tolerances of the sheet metal coil.
 
 <img src="../images/example_sheet.png" width="700">
 
@@ -63,9 +63,9 @@ Before forming, two line measurements are taken on the flat blank — the sheet 
 
 <img src="../images/agg_sheet_heatmap.png" width="700">
 
-*Sheet thickness traverses of all parts of category 2 side by side — the coil-to-coil variation of the raw material.*
+*Sheet thickness traverses of all parts of category 2 side by side, the coil-to-coil variation of the raw material.*
 
-**Oil film traverse** — an AMEPA oil film meter traverses the lubricated blank and records the oil area density in g/m². The three oil types of the parameter grid differ in this applied pattern.
+**Oil film traverse**: an AMEPA oil film meter traverses the lubricated blank and records the oil area density in g/m². The three oil types of the parameter grid differ in this applied pattern.
 
 <img src="../images/example_oil.png" width="700">
 
@@ -73,22 +73,22 @@ Before forming, two line measurements are taken on the flat blank — the sheet 
 
 <img src="../images/agg_oil_heatmap.png" width="700">
 
-*Oil film traverses of all parts of category 2 side by side — the scatter of the lubrication pattern across repetitions.*
+*Oil film traverses of all parts of category 2 side by side, the scatter of the lubrication pattern across repetitions.*
 
-**3D laser scans** — a Keyence LJ-X8400 laser line scanner captures the formed part after deep drawing (OP10) and again after cutting (OP20), recording a height and a luminescence buffer on a 3200 x 2000 pixel grid (6.4 million points per scan).
+**3D laser scans**: a Keyence LJ-X8400 laser line scanner captures the formed part after deep drawing (OP10) and again after cutting (OP20), recording a height and a luminescence buffer on a 3200 x 2000 pixel grid (6.4 million points per scan).
 
 <img src="../images/example_scan_op20.png" width="700">
 
-*OP20 laser scan (height buffer) of experiment `0000` — the cut cup on the magnetic gripper surface.*
+*OP20 laser scan (height buffer) of experiment `0000`, the cut cup on the magnetic gripper surface.*
 
-The same buffers plot directly as a 3D point cloud — `rddac.scan_to_pointcloud` turns a scan into `(N, 3)` points and `rddac.plot_point_cloud` renders them (see the [visualization tutorial](tutorials/visualization.md)):
+The same buffers plot directly as a 3D point cloud: `rddac.scan_to_pointcloud` turns a scan into `(N, 3)` points and `rddac.plot_point_cloud` renders them (see the [visualization tutorial](tutorials/visualization.md)):
 
 <img src="../images/example_point_cloud.png" width="700">
 
-*OP10 scan of experiment `0000` as a 3D point cloud. The sparse bands on the steep cup walls are pixels without a laser return — raw data, no cleaning applied.*
+*OP10 scan of experiment `0000` as a 3D point cloud. The sparse bands on the steep cup walls are pixels without a laser return, raw data, no cleaning applied.*
 
 !!! note "Raw sensor data"
-    The scan `z` and `luminescence` buffers are stored in **uncalibrated sensor units**, and the number of samples `n` in the force and traverse tables varies per experiment — this is deliberately the raw data as recorded. The optional [preprocessing](preprocessing/index.md) step (`rddac preprocess`) derives calibrated, cleaned, fixed-shape data into a separate processed layer; the published files stay raw.
+    The scan `z` and `luminescence` buffers are stored in **uncalibrated sensor units**, and the number of samples `n` in the force and traverse tables varies per experiment; this is deliberately the raw data as recorded. The optional [preprocessing](preprocessing/index.md) step (`rddac preprocess`) derives calibrated, cleaned, fixed-shape data into a separate processed layer; the published files stay raw.
 
 ## Missing measurements
 
@@ -99,7 +99,7 @@ Not every experiment carries every modality. {{ missing_pointcloud() }} experime
 | `has_pointcloud` | {{ missing_pointcloud() }} | `pointcloud/` |
 | `has_oil` | {{ missing_oil() }} | `oil_thickness/` |
 
-Filter them out before streaming a view that touches the affected groups, e.g. `where=lambda row: row["has_oil"]` — see [Process parameters](process-parameters.md#filtering-recipe).
+Filter them out before streaming a view that touches the affected groups, e.g. `where=lambda row: row["has_oil"]`, see [Process parameters](process-parameters.md#filtering-recipe).
 
 ## Relationship to DDACS
 

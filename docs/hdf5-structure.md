@@ -64,7 +64,7 @@ Lines starting with `@` are HDF5 attributes; trailing `/` marks a group; bare na
 
 ## Shape notation
 
-- `n` is the number of samples in a table and **varies per experiment** (this is raw data as recorded — 1140 force samples here, a different count in the next file).
+- `n` is the number of samples in a table and **varies per experiment** (this is raw data as recorded, 1140 force samples here, a different count in the next file).
 - The scan buffers are always flat `(6400000,)` arrays over a fixed `y_shape x x_shape` = 2000 x 3200 grid.
 
 ## `force/`
@@ -84,7 +84,7 @@ The press signals sampled during OP10 as one `(n, 8)` table. Column layout (from
 The blank's thickness measured along a sensor traverse, as an `(n, 2)` table of `[sensor_position (mm), sheet_thickness (um)]`.
 
 !!! note "Sensor position carries a 50 mm mounting offset"
-    The raw `sensor_position` values include the 50 mm mounting offset of the thickness sensor, so positions run from 50 mm upward (roughly 50-257 mm). Subtract 50 to get positions relative to the traverse start — the example plots in these docs show positions with the offset removed.
+    The raw `sensor_position` values include the 50 mm mounting offset of the thickness sensor, so positions run from 50 mm upward (roughly 50-257 mm). Subtract 50 to get positions relative to the traverse start; the example plots in these docs show positions with the offset removed.
 
 ## `oil_thickness/`
 
@@ -95,7 +95,7 @@ The lubricant film measured along a sensor traverse, as an `(n, 2)` table of `[s
 
 ## `pointcloud/`
 
-Two laser scans of the part: `op10/` after deep drawing and `op20/` after cutting. Each holds two flat `(6400000,)` buffers — `z` (height) and `luminescence` (intensity) — stored row-major over the `y_shape x x_shape` (2000 x 3200) pixel grid declared as group attributes. Reshape with `arr.reshape(2000, 3200)` to recover the scan image; pixels with value `0` carry no measurement.
+Two laser scans of the part: `op10/` after deep drawing and `op20/` after cutting. Each holds two flat `(6400000,)` buffers, `z` (height) and `luminescence` (intensity), stored row-major over the `y_shape x x_shape` (2000 x 3200) pixel grid declared as group attributes. Reshape with `arr.reshape(2000, 3200)` to recover the scan image; pixels with value `0` carry no measurement.
 
 <img src="../images/scheme_scan_grid.png" width="600">
 

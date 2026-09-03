@@ -16,7 +16,7 @@
   <p><em>Measured point clouds of one experiment after OP10 (left) and OP20 (right), colored by the deviation from the matching DDACS simulation.</em></p>
 </div>
 
-**A large-scale experimental dataset of {{ experiment_count() }} physical deep-drawing and cutting experiments — the real-world counterpart to the [DDACS](https://ddacs.readthedocs.io) FEM simulations.** Each experiment forms a modified quadratic cup from DP600 dual-phase steel (deep drawing in OP10, cutting in OP20) and records press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans of the part after each operation. Use it to quantify the simulation-to-reality gap, train models on real process data, or validate DDACS-trained surrogates against physical measurements.
+**A large-scale experimental dataset of {{ experiment_count() }} physical deep-drawing and cutting experiments, the real-world counterpart to the [DDACS](https://ddacs.readthedocs.io) FEM simulations.** Each experiment forms a modified quadratic cup from DP600 dual-phase steel (deep drawing in OP10, cutting in OP20) and records press force signals, sheet-thickness and oil-film traverses, and high-resolution 3D laser scans of the part after each operation. Use it to quantify the simulation-to-reality gap, train models on real process data, or validate DDACS-trained surrogates against physical measurements.
 
 |  |  |
 |---|---|
@@ -73,7 +73,7 @@ for record in dataset_pkg.streaming.iter_view("force-curve", data_dir="./data", 
     ...
 ```
 
-Because RDDAC is the experimental counterpart to the DDACS simulations, `rddac download` also fetches the matching FEM simulations (`rddac.zip` from the DDACS dataset) into `./data/simulation` — skip them with `--no-sim`. See [Dataset Overview](dataset.md#relationship-to-ddacs) for the pairing.
+Because RDDAC is the experimental counterpart to the DDACS simulations, `rddac download` also fetches the matching FEM simulations (`rddac.zip` from the DDACS dataset) into `./data/simulation`, skip them with `--no-sim`. See [Dataset Overview](dataset.md#relationship-to-ddacs) for the pairing.
 
 ## License
 
