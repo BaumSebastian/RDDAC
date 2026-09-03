@@ -227,6 +227,41 @@ def z_at_center(points: np.ndarray, radius: float = 5.0) -> float:
     return float(np.median(points[mask, 2]))
 
 
+def _voxel_pool(points: np.ndarray, voxel_mm: float = 0.35) -> np.ndarray:
+    """One representative point per voxel, so dense regions do not outweigh sparse ones."""
+    vox = np.round(points / voxel_mm).astype(np.int64)
+    _, keep = np.unique(vox, axis=0, return_index=True)
+    return points[np.sort(keep)]
+
+
+def _distance_stats(distances: np.ndarray) -> dict:
+    """Robust summary statistics of nearest-neighbour distances (icp_* attrs)."""
+    q1, q2, q3 = (float(np.percentile(distances, p)) for p in (25, 50, 75))
+    iqr = q3 - q1
+    return {
+        "icp_mean_distance": float(np.mean(distances)),
+        "icp_std_distance": float(np.std(distances)),
+        "icp_median_distance": q2,
+        "icp_q1_distance": q1,
+        "icp_q3_distance": q3,
+        "icp_whisker_low": float(max(np.min(distances), q1 - 1.5 * iqr)),
+        "icp_whisker_high": float(min(np.max(distances), q3 + 1.5 * iqr)),
+    }
+
+
+def _deck_center(points: np.ndarray, z_lo: float) -> np.ndarray | None:
+    """Outline midpoint (x, y) of the deck: all points above ``z_lo``.
+
+    The midpoint of the robust per-axis extents depends only on the deck
+    boundary, not on the scan's anisotropic interior point density.
+    """
+    deck = points[points[:, 2] > z_lo]
+    if len(deck) < 100:
+        return None
+    lo, hi = np.percentile(deck[:, :2], [0.5, 99.5], axis=0)
+    return (lo + hi) / 2.0
+
+
 def run_icp(
     source: np.ndarray,
     target: np.ndarray,
@@ -251,7 +286,11 @@ def run_icp(
         robust summary statistics of the final nearest-neighbour distances.
     """
     rng = np.random.RandomState(seed)
-    src = source[rng.choice(len(source), n_sample, replace=False)].copy() if len(source) > n_sample else source.copy()
+    # Density-neutral subsample: one representative per 0.35 mm voxel first, so
+    # densely scanned directions (x pitch 0.077 vs y pitch 0.158 mm) and lightly
+    # cleaned regions do not outweigh sparse ones in the fit.
+    pool = _voxel_pool(source)
+    src = pool[rng.choice(len(pool), n_sample, replace=False)].copy() if len(pool) > n_sample else pool.copy()
 
     r_total = np.eye(3)
     t_total = np.zeros(3)
@@ -274,18 +313,7 @@ def run_icp(
         t_total = r @ t_total + t
 
     final_distances, _ = KDTree(target).query(src)
-    q1, q2, q3 = (float(np.percentile(final_distances, p)) for p in (25, 50, 75))
-    iqr = q3 - q1
-    stats = {
-        "icp_mean_distance": float(np.mean(final_distances)),
-        "icp_std_distance": float(np.std(final_distances)),
-        "icp_median_distance": q2,
-        "icp_q1_distance": q1,
-        "icp_q3_distance": q3,
-        "icp_whisker_low": float(max(np.min(final_distances), q1 - 1.5 * iqr)),
-        "icp_whisker_high": float(min(np.max(final_distances), q3 + 1.5 * iqr)),
-    }
-    return r_total, t_total, stats
+    return r_total, t_total, _distance_stats(final_distances)
 
 
 def align_to_simulation(
@@ -300,14 +328,17 @@ def align_to_simulation(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict]:
     """Rigidly align a scan to its simulation, anchored on the cup.
 
-    Two ICP passes. The first uses all inlier points and brings the scan into
-    the simulation frame; it is robust while fins are still present. The
-    second is restricted to the cup (bottom and walls): every point higher
-    than the simulation's flange level plus ``anchor_height_mm``, selected
-    identically on both sides. This keeps the flange, the region most
-    affected by springback and draw-in, from biasing the pose, so the
-    remaining wall and radius deviations are attributed to the part, not to
-    the alignment. After each pass the z offset is fixed at the cup centre.
+    Two ICP passes plus a deck centering. The first pass uses all inlier
+    points and brings the scan into the simulation frame; it is robust while
+    fins are still present. The second is restricted to the cup (bottom and
+    walls): every point higher than the simulation's flange level plus
+    ``anchor_height_mm``, selected identically on both sides. This keeps the
+    flange, the region most affected by springback and draw-in, from biasing
+    the pose, so the remaining wall and radius deviations are attributed to
+    the part, not to the alignment. Because the ICP cost is nearly flat in
+    x/y for these level-topped parts, a final x/y shift matches the occupancy
+    centroids of the two decks, distributing any real width difference
+    symmetrically. After each step the z offset is fixed at the cup centre.
 
     Args:
         points: ``(N, 3)`` calibrated scan points.
@@ -344,12 +375,35 @@ def align_to_simulation(
         stats = {"n_anchor_points": int(cup.sum())}
         return aligned, rotation, translation, stats
 
-    rotation_2, translation_2, stats = run_icp(aligned[cup], sim_cup, max_iterations, n_sample, seed)
+    rotation_2, translation_2, _ = run_icp(aligned[cup], sim_cup, max_iterations, n_sample, seed)
     aligned = aligned @ rotation_2.T + translation_2
     z_offset_2 = z_at_center(aligned[inlier]) - z_at_center(sim_pts)
     aligned[:, 2] -= z_offset_2
 
+    # The point-to-point cost is nearly flat in x/y (deck and flange are level
+    # planes), so the ICP pose inside that valley is ambiguous and tends to
+    # pile the real scan-vs-simulation width difference onto one side. Anchor
+    # x/y symmetrically instead: match the occupancy centroids of both decks.
+    deck_z = float(sim_pts[:, 2].max()) - 2.0
+    center_scan = _deck_center(aligned[inlier], deck_z)
+    center_sim = _deck_center(sim_pts, deck_z)
+    deck_shift = np.zeros(2) if center_scan is None or center_sim is None else center_sim - center_scan
+    aligned[:, :2] += deck_shift
+    z_offset_3 = z_at_center(aligned[inlier]) - z_at_center(sim_pts)
+    aligned[:, 2] -= z_offset_3
+
     rotation = rotation_2 @ rotation_1
-    translation = rotation_2 @ (translation_1 - z_offset_1 * z_axis) + translation_2 - z_offset_2 * z_axis
-    stats = dict(stats, n_anchor_points=int(cup.sum()))
+    translation = (
+        rotation_2 @ (translation_1 - z_offset_1 * z_axis)
+        + translation_2
+        - z_offset_2 * z_axis
+        + np.append(deck_shift, -z_offset_3)
+    )
+    distances, _ = KDTree(sim_cup).query(_voxel_pool(aligned[cup]))
+    stats = dict(
+        _distance_stats(distances),
+        n_anchor_points=int(cup.sum()),
+        deck_shift_x=float(deck_shift[0]),
+        deck_shift_y=float(deck_shift[1]),
+    )
     return aligned, rotation, translation, stats

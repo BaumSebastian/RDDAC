@@ -3,7 +3,13 @@
 The `pointcloud` stage turns the raw laser-scan grids (`pointcloud/{op10,op20}/z` + `luminescence`) into cleaned, simulation-aligned point clouds: `z` becomes `(N, 3) float32` (Open3D-ready) and `luminescence` a `(2000, 3200) uint8` grayscale image (Pillow-ready). It is the only stage that needs the optional dependencies (`pip install 'rddac[preprocessing]'`) and the DDACS simulations.
 
 !!! warning "Needs the DDACS simulations"
-    Every scan is aligned to its best-matching DDACS simulation, so the stage requires the simulations fetched by `rddac download` (without `--no-sim`). Without them the command exits with an actionable error before touching any file.
+    Every scan is aligned to its best-matching DDACS simulation, so the stage requires the simulations fetched by `rddac download` (without `--no-sim`). Without them the command exits with an actionable error before touching any file. If you only miss the simulations, fetch just those:
+
+    ```bash
+    ddacs download --files rddac.zip --out ./data/simulation
+    ```
+
+    (`./data` = your `--data-dir`; the stage looks for `simulation/rddac.zip` inside it.)
 
 | Property | Raw | Processed |
 | --- | --- | --- |
@@ -17,13 +23,8 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 
 ## Processing steps
 
-1. **Validity mask**: connected-component filtering of the luminescence grid plus `z > 0`.
-
-    <img src="../../images/preprocessing/luminescence_processing_concave_op10.png" width="900">
-
-    *Luminescence of one OP10 scan: raw grid (a), connected foreground patches (b), the validity mask after the patch-size filter (c), and the packed `uint8` image written to the processed file (d).*
-
-2. **Calibration**: x from the sensor specification, z from the calibration-block measurement (both packaged in `calibration.json`), y per scan from the square-part assumption.
+1. **Validity mask**: connected-component filtering of the luminescence grid plus `z > 0`; the one step shared with the [luminescence image](#the-luminescence-image-an-independent-output) below.
+2. **Calibration**: all three scales from the packaged `calibration.json`: x from the sensor specification, z from the calibration-block measurement, y the constant line spacing of the measurement configuration (see [Calibration constants](#calibration-constants)).
 3. **Geometric outlier seeds**: three complementary detectors, then morphological closing on a kNN graph:
     - *surface angle*: local SVD plane fits; a point is seeded when its normal deviates more than the cutoff from vertical,
 
@@ -43,6 +44,35 @@ Raw scans carry measurement artifacts, most prominently **fins**: locally smooth
 <img src="../../images/preprocessing/pointcloud_processing_convex_op20.png" width="900">
 
 *Experiments 0 (concave) and 4500 (convex), both part of the small bundle and processed with the simulations present, in top view, OP10 (deep drawing) and OP20 (cutting) each: (a) the raw calibrated scan after the validity mask, (b) the processed, ICP-aligned point cloud (gaps are the removed fins and outliers), (c) the matched DDACS simulation in the same frame, and (d) the processed points coloured by their nearest-neighbour distance to the simulation, the same `kd` sim-distance feature the fin classifier uses.*
+
+??? example "These figures were created with"
+
+    ```bash
+    python -m rddac._preprocess.visualize pointcloud \
+        --data-dir /path/to/rddac --id 0 --op op10 --out docs/images/preprocessing
+    # analogously --id 0 --op op20, and --id 4500 for the convex figures
+    ```
+
+    The `plot_pointcloud_processing` function takes the raw arrays and derives the
+    processed view through the stage's own `process` function, so the figure is by
+    construction what `rddac preprocess pointcloud` produces (see the
+    [preprocessing tutorial](../tutorials/preprocessing.md)).
+
+
+## The luminescence image: an independent output
+
+Although the same `rddac preprocess pointcloud` command produces both outputs, the
+luminescence path is its **own, independent processing**: the raw luminescence grid is
+segmented into connected foreground patches, filtered by patch size into the validity
+mask (the only artifact shared with the point-cloud path), and packed into a
+`(2000, 3200) uint8` grayscale image: 0 reserved for background, valid pixels
+normalized to 1–255, ready for Pillow / image models. None of the later point-cloud
+steps touch it: outlier seeds, the fin classifier and the ICP alignment act only on
+the 3D points, so the luminescence image keeps the full scanner grid.
+
+<img src="../../images/preprocessing/luminescence_processing_concave_op10.png" width="900">
+
+*Luminescence of one OP10 scan: raw grid (a), connected foreground patches (b), the validity mask after the patch-size filter (c), and the packed `uint8` image written to the processed file (d).*
 
 ## Calibration constants
 

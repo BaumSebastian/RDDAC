@@ -5,6 +5,37 @@ All notable changes to the `rddac` package are documented here. The format follo
 `bumpver` tags. The dataset itself is versioned on DaRUS (doi:10.18419/DARUS-5589)
 independently of the package.
 
+## [Unreleased]
+
+### Changed
+- Default dataset version is now **2.0** (DaRUS doi:10.18419/DARUS-5589).
+  Dataset 2.0 corrects the assignment of the convex force measurements
+  (ids 4500-8999): in 1.0 the `force/data` group and the derived
+  `mean_punch_temp` of these experiments were attached to the wrong ids;
+  sheet thickness, oil film, point clouds and all labels were and are correct.
+  `process_parameters.csv` changes in the `mean_punch_temp` column only.
+- The software itself is unchanged and **backwards compatible**: both dataset
+  versions share the same layout, every view and the preprocessing work on
+  either, and `rddac download 1.0` still fetches the previous version.
+- After switching a local copy to dataset 2.0, refresh the force-derived
+  processed layer with `rddac preprocess force --overwrite`; the other
+  modalities are unaffected.
+
+## [1.1.2] - 2026-09-03
+
+### Changed
+- Pointcloud ICP now draws its sample from a density-neutral 0.35 mm voxel
+  grid. The scanner grid is twice as dense in x as in y and the fin cleaner
+  thins one wall, which let dense regions dominate the fit and overstate the
+  deviation of sparse walls (~0.1 mm pose bias, clearly visible on convex
+  OP20). Reprocess point clouds with `rddac preprocess pointcloud --overwrite`.
+- Pointcloud alignment gained a third step after the cup-anchored ICP: the scan
+  is centered in x/y on the deck outline of the simulation. The ICP cost is
+  nearly flat in x/y for these level-topped parts, so the pose inside that
+  valley was ambiguous and piled the real scan-vs-simulation width difference
+  onto one side. The applied shift is stored in the new `deck_shift_x` and
+  `deck_shift_y` attributes.
+
 ## [1.1.1] - 2026-09-01
 
 ### Changed
@@ -63,7 +94,8 @@ independently of the package.
   PyTorch `RDDACDataset`, plotting helpers, documentation and six tutorial
   notebooks.
 
-[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.1...HEAD
+[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.2...HEAD
+[1.1.2]: https://github.com/BaumSebastian/RDDAC/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/BaumSebastian/RDDAC/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/BaumSebastian/RDDAC/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/BaumSebastian/RDDAC/compare/1.0.0...1.0.1
