@@ -16,7 +16,7 @@ RDDAC_SPEC = DatasetSpec(
     name="RDDAC",
     prog="rddac",
     dataset_doi="doi:10.18419/DARUS-5589",
-    default_version="1.0",
+    default_version="2.0",
     # Experiment ids are zero-padded in the HDF5 member names: 42 -> "0042.h5".
     id_format="{:04d}",
     small_test_files=(

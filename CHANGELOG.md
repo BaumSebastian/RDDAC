@@ -5,7 +5,7 @@ All notable changes to the `rddac` package are documented here. The format follo
 `bumpver` tags. The dataset itself is versioned on DaRUS (doi:10.18419/DARUS-5589)
 independently of the package.
 
-## [Unreleased]
+## [2.0.0] - 2026-09-15
 
 ### Changed
 - Default dataset version is now **2.0** (DaRUS doi:10.18419/DARUS-5589).
@@ -94,7 +94,8 @@ independently of the package.
   PyTorch `RDDACDataset`, plotting helpers, documentation and six tutorial
   notebooks.
 
-[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/1.1.2...HEAD
+[Unreleased]: https://github.com/BaumSebastian/RDDAC/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/BaumSebastian/RDDAC/compare/1.1.2...2.0.0
 [1.1.2]: https://github.com/BaumSebastian/RDDAC/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/BaumSebastian/RDDAC/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/BaumSebastian/RDDAC/compare/1.0.1...1.1.0

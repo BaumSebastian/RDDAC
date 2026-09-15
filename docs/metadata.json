@@ -60,14 +60,14 @@
     {
       "@type": "Person",
       "name": "Baum, Sebastian",
-      "affiliation": "University of Stuttgart",
-      "identifier": ""
+      "affiliation": "https://ror.org/04vnq7t77",
+      "identifier": "https://orcid.org/0009-0001-0604-8764"
     },
     {
       "@type": "Person",
       "name": "Heinzelmann, Pascal",
-      "affiliation": "University of Stuttgart",
-      "identifier": ""
+      "affiliation": "https://ror.org/04vnq7t77",
+      "identifier": "https://orcid.org/0009-0000-0638-7320"
     }
   ],
   "keywords": [
@@ -90,8 +90,8 @@
       "name": "process_parameters.csv",
       "description": "Per-experiment parameter table; join to HDF5 files via `index`.",
       "encodingFormat": "text/csv",
-      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/598301?format=original",
-      "md5": "b78905067334bcd6860360b5869a85ac",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/656967?format=original",
+      "md5": "8a0d52ca7032d4550aebc8740d46efdf",
       "contentSize": "446989 B"
     },
     {
@@ -119,9 +119,9 @@
       "@id": "sample_zip",
       "name": "sample.zip",
       "encodingFormat": "application/zip",
-      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/594669",
-      "md5": "4b61770b34f0517641df613e00a15e56",
-      "contentSize": "173778285 B",
+      "contentUrl": "https://darus.uni-stuttgart.de/api/access/datafile/656966",
+      "md5": "e22c0c19f7cb79a3ffdd6089d479c231",
+      "contentSize": "173855325 B",
       "description": "Small sample (one experiment per category, 18 files) for quick tryout and testing without downloading the full dataset. These experiments are not repeated in concave.zip / convex.zip."
     },
     {
