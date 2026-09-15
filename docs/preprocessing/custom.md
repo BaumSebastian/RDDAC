@@ -2,12 +2,13 @@
 
 `rddac preprocess` is the **reference implementation** of the processed layout, not the only allowed one. The raw dataset is immutable and readable through the public API, so anyone with a better algorithm can produce their own processed layer: the contract is the **schema of the output files**, not a Python interface.
 
-## Three levels of adjustment
+## Levels of adjustment
 
 | Level | When | How |
 | --- | --- | --- |
 | 1. Change parameters | the algorithm is fine, a threshold or window is not | `--config my.toml`, no code |
-| 2. Replace one step | you want a different filter for one modality, the reference stages for the rest | write that modality's group yourself, let `rddac preprocess` do the others |
+| 2a. Replace one step | you want a different filter for one modality, the reference stages for the rest | write that modality's group yourself, let `rddac preprocess` do the others |
+| 2b. Add a step | the reference output is right, you need something derived on top | append new datasets to the processed files |
 | 3. Replace everything | a different pipeline altogether | produce files matching the schema in your own directory |
 
 ### Level 1: parameters
@@ -27,7 +28,7 @@ rddac preprocess oil --config my.toml --overwrite
 
 The values used are stamped into `oil_thickness` attributes of every output file (`hampel_window`, `hampel_k`, ...), and the docs figure can be redrawn for the variant with the same overrides: `python -m rddac._preprocess.visualize oil --id 0 --config my.toml --out .`.
 
-### Level 2: replace one step, keep the rest
+### Level 2a: replace one step, keep the rest
 
 Say you prefer a plain running-median filter to the Hampel filter for the oil film. Write the `oil_thickness` group yourself and leave the other modalities to the reference stages. The output directory is shared: `rddac preprocess` appends to existing files and never touches groups it did not create unless `--overwrite` is given.
 
@@ -64,7 +65,7 @@ for exp_id in sorted(available_ids(DATA_DIR) or []):
         g = out.create_group("oil_thickness")
         g.create_dataset("data", data=cleaned)
         g.attrs["columns"], g.attrs["units"] = ["sensor_position", "oil_value"], ["mm", "g/m^2"]
-        g.attrs["producer"], g.attrs["median_kernel"] = "median_oil v1", 7     # honest provenance
+        g.attrs["producer"], g.attrs["median_kernel"] = "median_oil v1", 7     # record what produced this
 ```
 
 ```bash
@@ -73,9 +74,49 @@ rddac preprocess force sheet        # the reference stages fill in the other gro
 
 The result is one processed layer: your oil profiles next to the reference force and sheet tables, streamable through the same views (`iter_view("oil-thickness", data_dir="./data/processed", source="./data/metadata.json")`). To compare against the reference, run `rddac preprocess oil --out ./data/reference` and plot both.
 
-### Level 3: the contract
+### Level 2b: add a step on top of a reference stage
 
-Read raw experiments with the public API, run your algorithm, and write files matching the [processed schema](index.md#what-each-modality-does) into your own output directory. The contract is the schema, not a Python interface:
+A step that *extends* the reference output: let `rddac preprocess pointcloud` do the
+full reference processing, then derive from it.
+
+**Example:** a fixed-size random subsample (4,096 points) of every processed cloud,
+the typical input size for point-cloud networks:
+
+```python
+from pathlib import Path
+
+import h5py
+import numpy as np
+
+OUT_DIR = Path("./data/processed")
+N, SEED = 4_096, 42
+
+for path in sorted(OUT_DIR.glob("*.h5")):
+    with h5py.File(path, "a") as f:
+        if "pointcloud" not in f:
+            continue
+        for op_i, op in enumerate(("op10", "op20")):
+            pts = f[f"pointcloud/{op}/z"][:]                       # (M, 3) processed cloud
+            # seed per (file, op): rerunning any single file reproduces its sample,
+            # independent of processing order or which other files are present
+            rng = np.random.default_rng([SEED, int(path.stem), op_i])
+            pick = rng.choice(len(pts), size=N, replace=False)
+            name = f"pointcloud/{op}/z_{N}"
+            if name in f:
+                del f[name]
+            d = f.create_dataset(name, data=pts[np.sort(pick)])
+            d.attrs["producer"] = "random_subsample v1"             # record what produced this
+            d.attrs["subsample_n"], d.attrs["subsample_seed"] = N, SEED
+```
+
+Two points: add a new dataset (`z_4096`) instead of replacing `z`, since downstream
+tooling expects the full cloud, and record the parameters (n, seed, producer) in the
+attributes. The same pattern applies to any derived quantity: normals, voxel grids,
+per-point features.
+
+### Level 3: your own pipeline
+
+Read the raw files through the public API, run your own processing, and write the results into a separate directory in the same file schema. There is no Python interface to implement; output files only need to follow the [processed schema](index.md#what-each-modality-does):
 
 ```python
 import h5py
@@ -91,15 +132,15 @@ for exp_id in range(9000):
         group = out.create_group("oil_thickness")
         group.create_dataset("data", data=cleaned)
         group.attrs["columns"] = ["sensor_position", "oil_value"]
-        group.attrs["producer"] = "my_better_oil v1"            # honest provenance
+        group.attrs["producer"] = "my_better_oil v1"            # record what produced this
 ```
 
-Files that match the schema are consumable by the same downstream tooling as the reference output. Because raw data is canonical and pinned by the published Croissant manifest, *anyone* can reproduce your processed layer from your code: replacing an algorithm always means running it yourself; there is nothing server-side to swap.
+Files in this schema work with the same views and downstream tooling as the reference output. The raw data is fixed and checksummed through the published Croissant manifest, so a processed layer is reproducible from its code alone; there is no server-side component involved.
 
-Two conventions keep replacements honest:
+Two conventions:
 
-- **Never write into the raw directory**: the published checksums are the dataset's identity.
-- **Stamp what you did** into the group attributes (the reference stages record every parameter used), so a processed file documents itself even when separated from the code.
+- Do not write into the raw directory. The published checksums define the dataset.
+- Record the parameters and code version in the group attributes (the reference stages store every parameter they used), so a processed file can be interpreted without the code that produced it.
 
 ## Internal reference
 
