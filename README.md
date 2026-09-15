@@ -39,7 +39,6 @@ A Croissant-native Python package for accessing the [RDDAC Dataset](https://daru
 
 ## Table of Contents
 
-- [What's new in 1.1](#whats-new-in-11)
 - [Installation](#installation)
 - [Download the dataset](#download-the-dataset)
 - [Preprocess the dataset](#preprocess-the-dataset)
@@ -50,16 +49,6 @@ A Croissant-native Python package for accessing the [RDDAC Dataset](https://daru
 - [Citation](#citation)
 - [Development](#development)
 - [License](#license)
-
-## What's new in 1.1
-
-1.1 adds the reference preprocessing. The published files stay raw by design; `rddac preprocess` derives an ML-ready layer next to them:
-
-- `force`, `sheet`, `oil`: fixed-shape, cleaned tables (forming-window force curves, error-masked thickness and dropout-free oil-film profiles).
-- `pointcloud`: calibrated scans, cleaned of fins by a random-forest classifier, aligned to the matching DDACS simulation (needs the `[preprocessing]` extra and the simulations).
-- Every parameter is adjustable via TOML and stamped into the output; the same Croissant views stream both layers.
-
-See [Preprocessing](https://rddac.readthedocs.io/en/latest/preprocessing/) for what each stage does and the [changelog](CHANGELOG.md) for the details.
 
 ## Installation
 
@@ -155,13 +144,7 @@ The tutorials walk through the package end to end. Each one is published on Read
 
 ## Version compatibility
 
-The `rddac` package major version tracks the DaRUS dataset major version. The pairing is enforced by the Croissant manifest bundled with each release: a mismatched package version will fail to resolve the field map.
-
-| Package | DaRUS dataset |
-|---------|---------------|
-| `rddac 1.x` | [v1.0](https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-5589&version=1.0) and any future v1.x updates (current) |
-
-Pin the package major to the dataset major you target, for example `pip install 'rddac~=1.0'` to stay on the v1 line.
+The `rddac` package major version tracks the DaRUS dataset major version: each package line defaults to the matching dataset version. The dataset versions share the same file layout, so every view and the preprocessing work on either, and earlier versions stay reachable via `rddac download <version>`. Pin the package major to the dataset line you target, and see the [changelog](CHANGELOG.md) for what changed in each release.
 
 ## Citation
 
