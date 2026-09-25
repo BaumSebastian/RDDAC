@@ -135,6 +135,9 @@ jobs:
 
   kaggle-dataset:
     needs: fetch-teaser
+    # not the implicit success(): that checks the transitive needs chain, in
+    # which pypi is skipped on dispatch
+    if: ${{ !cancelled() && needs.fetch-teaser.result == 'success' }}
     runs-on: ubuntu-latest
     environment: kaggle
     steps:
@@ -158,6 +161,9 @@ jobs:
 
   huggingface:
     needs: fetch-teaser
+    # not the implicit success(): that checks the transitive needs chain, in
+    # which pypi is skipped on dispatch
+    if: ${{ !cancelled() && needs.fetch-teaser.result == 'success' }}
     runs-on: ubuntu-latest
     environment: huggingface
     steps:
@@ -182,6 +188,9 @@ jobs:
 
   zenodo:
     needs: fetch-teaser
+    # not the implicit success(): that checks the transitive needs chain, in
+    # which pypi is skipped on dispatch
+    if: ${{ !cancelled() && needs.fetch-teaser.result == 'success' }}
     runs-on: ubuntu-latest
     environment: zenodo
     steps:
