@@ -44,7 +44,11 @@ CONFIG_FILE = HERE / "metadata.json"
 
 BASE = os.environ.get("ZENODO_URL", "https://zenodo.org").rstrip("/")
 TOKEN = os.environ.get("ZENODO_API_TOKEN") or sys.exit("Set ZENODO_API_TOKEN")
-AUTH = {"Authorization": f"Bearer {TOKEN}"}
+AUTH = {
+    "Authorization": f"Bearer {TOKEN}",
+    # Zenodo blocks the default python-requests User-Agent; identify the client.
+    "User-Agent": "rddac-publish/2.0 (https://github.com/BaumSebastian/RDDAC)",
+}
 
 # staged path -> filename on Zenodo (flat)
 FILES = {
